@@ -7,6 +7,7 @@
   --line: #e7e2db;
   --pill: #f3f2ef;
   --shadow: 0 16px 50px rgba(26, 24, 21, 0.06);
+  --content-rhythm: 18px;
   color-scheme: light;
 }
 
@@ -194,7 +195,7 @@ a {
 
 .hero-copy p {
   max-width: 590px;
-  margin: 17px 0 0;
+  margin: var(--content-rhythm) 0 0;
   color: #545454;
   font-size: 15.5px;
   line-height: 1.35;
@@ -202,7 +203,7 @@ a {
 }
 
 .filter-bar {
-  margin: 18px 0 11px;
+  margin: var(--content-rhythm) 0;
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
@@ -238,6 +239,7 @@ a {
 .projects-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(238px, 1fr));
+  margin: 0;
   gap: 11px 12px;
 }
 
