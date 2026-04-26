@@ -94,21 +94,11 @@
       padding: 2rem 2.5rem;
       width: 100%;
     }
-    .logo-centered {
-      font-family: var(--font-sans);
-      font-size: 14px;
-      font-weight: 500;
-      letter-spacing: 0.25em;
-      color: var(--fg-soft);
-      text-decoration: none;
-    }
-    .logo-centered .accent { color: var(--accent); }
-    .contact-link {
+    .header-link {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       padding: 0.5rem 0.75rem;
-      margin-right: -0.75rem;
       border-radius: 999px;
       color: var(--fg);
       transition: background 240ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -116,8 +106,11 @@
       font-family: var(--font-sans);
       font-size: 13px;
       letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
-    .contact-link:hover, .contact-link:focus-visible {
+    .header-link:first-child { margin-left: -0.75rem; }
+    .header-link:last-child { margin-right: -0.75rem; }
+    .header-link:hover, .header-link:focus-visible {
       background: var(--surface-muted);
     }
 
@@ -626,8 +619,8 @@
   <div class="page-surface">
 
     <header class="perspectives-header">
-      <a href="#" class="logo-centered">MULTI<span class="accent">·</span>MODEL</a>
-      <a href="mailto:contact@example.com" class="contact-link" aria-label="Contact">Contact</a>
+      <a href="index.html" class="header-link">Back</a>
+      <a href="blog_interp.html" class="header-link">Next</a>
     </header>
 
     <main class="main">
@@ -638,8 +631,7 @@
         <p class="date">STEPHEN CASELLA · APRIL 2026</p>
 
         <div class="paper-links">
-          <a href="#" class="btn-pill">Github</a>
-          <a href="#" class="btn-pill">Recipe</a>
+          <a href="https://github.com/scasella/multi-model" class="btn-pill">GitHub repo</a>
         </div>
 
         <div class="benchmarks-body">

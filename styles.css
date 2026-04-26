@@ -343,6 +343,7 @@ a {
   line-height: 1.08;
   font-weight: 650;
   letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
 }
 
 .project-card p {
@@ -372,11 +373,6 @@ a {
   font-size: 11px;
   line-height: 1.2;
   white-space: nowrap;
-}
-
-.project-card:nth-child(8) h3 {
-  font-size: 13.5px;
-  letter-spacing: 0;
 }
 
 .site-footer {

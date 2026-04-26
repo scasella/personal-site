@@ -82,21 +82,11 @@
       padding: 2rem 2.5rem;
       width: 100%;
     }
-    .logo-centered {
-      font-family: var(--font-sans);
-      font-size: 14px;
-      font-weight: 500;
-      letter-spacing: 0.25em;
-      color: var(--fg-soft);
-      text-decoration: none;
-    }
-    .logo-centered .accent { color: var(--accent); }
-    .contact-link {
+    .header-link {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       padding: 0.5rem 0.75rem;
-      margin-right: -0.75rem;
       border-radius: 999px;
       color: var(--fg);
       transition: background 240ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -104,8 +94,11 @@
       font-family: var(--font-sans);
       font-size: 13px;
       letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
-    .contact-link:hover, .contact-link:focus-visible { background: var(--surface-muted); }
+    .header-link:first-child { margin-left: -0.75rem; }
+    .header-link:last-child { margin-right: -0.75rem; }
+    .header-link:hover, .header-link:focus-visible { background: var(--surface-muted); }
 
     .benchmarks-content {
       max-width: 720px;
@@ -563,8 +556,8 @@
   <div class="page-surface">
 
     <header class="perspectives-header">
-      <a href="#" class="logo-centered">INTERP<span class="accent">&middot;</span>LAB</a>
-      <a href="mailto:contact@example.com" class="contact-link" aria-label="Contact">Contact</a>
+      <a href="index.html" class="header-link">Back</a>
+      <a href="blog_multipersona.html" class="header-link">Next</a>
     </header>
 
     <main class="main">
@@ -575,10 +568,7 @@
         <p class="date">STEPHEN CASELLA &middot; APRIL 2026</p>
 
         <div class="paper-links">
-          <a href="paper_draft.md" class="btn-pill">Paper draft</a>
-          <a href="paper_references.bib" class="btn-pill">References</a>
-          <a href="../artifacts/runs/factscore_bootstrap_ci.json" class="btn-pill">FActScore CIs</a>
-          <a href="../artifacts/runs/maud_bootstrap_ci_v2.json" class="btn-pill">MAUD CIs</a>
+          <a href="https://github.com/scasella/activation-probes-claim-correctness" class="btn-pill">GitHub repo</a>
         </div>
 
         <div class="benchmarks-body">

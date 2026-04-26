@@ -74,66 +74,29 @@
 
         <div class="filter-bar" aria-label="Project filters">
           <button class="filter-pill is-active" type="button" data-filter="featured" aria-pressed="true">Featured</button>
+          <button class="filter-pill" type="button" data-filter="all" aria-pressed="false">All</button>
           <button class="filter-pill" type="button" data-filter="macos" aria-pressed="false">macOS</button>
           <button class="filter-pill" type="button" data-filter="research" aria-pressed="false">Research</button>
           <button class="filter-pill" type="button" data-filter="utilities" aria-pressed="false">Utilities</button>
         </div>
 
-        <section class="projects-grid" aria-label="Featured projects">
+        <section class="projects-grid" aria-label="Projects">
           <a
             class="project-card"
             href="https://github.com/scasella/nanochat-mlx"
-            data-categories="featured macos research"
+            data-categories="featured research"
           >
             <div class="thumb screenshot-thumb">
               <img
-                src="assets/generated-screenshots/nanochat-mlx.png"
+                src="assets/project-diagrams/nanochat-mlx.svg"
                 alt=""
                 loading="lazy"
               >
             </div>
             <h3>nanochat-mlx</h3>
-            <p>Native macOS chat app for local LLMs powered by MLX.</p>
+            <p>Train your own ChatGPT on Apple Silicon. MLX port of nanochat.</p>
             <ul class="tags" aria-label="Project tags">
-              <li>macOS</li><li>MLX</li><li>LLM</li>
-            </ul>
-          </a>
-
-          <a
-            class="project-card"
-            href="https://github.com/scasella/TabPilot"
-            data-categories="featured macos utilities"
-          >
-            <div class="thumb screenshot-thumb">
-              <img
-                src="assets/readme-screenshots/tabpilot.png"
-                alt=""
-                loading="lazy"
-              >
-            </div>
-            <h3>TabPilot</h3>
-            <p>AI copilot in your menu bar for smarter browsing.</p>
-            <ul class="tags" aria-label="Project tags">
-              <li>macOS</li><li>AI</li><li>Productivity</li>
-            </ul>
-          </a>
-
-          <a
-            class="project-card"
-            href="https://github.com/scasella/SafariMarkdown"
-            data-categories="featured macos utilities"
-          >
-            <div class="thumb screenshot-thumb">
-              <img
-                src="assets/readme-screenshots/safarimarkdown.png"
-                alt=""
-                loading="lazy"
-              >
-            </div>
-            <h3>SafariMarkdown</h3>
-            <p>Convert any webpage to clean, readable Markdown.</p>
-            <ul class="tags" aria-label="Project tags">
-              <li>macOS</li><li>Safari</li><li>Markdown</li>
+              <li>MLX</li><li>Apple Silicon</li><li>Training</li>
             </ul>
           </a>
 
@@ -150,28 +113,66 @@
               >
             </div>
             <h3>SunShift</h3>
-            <p>Automatically shifts your display with the sun.</p>
+            <p>Adjust Night Shift intensity from the menu bar.</p>
             <ul class="tags" aria-label="Project tags">
-              <li>macOS</li><li>Wellness</li><li>Display</li>
+              <li>macOS</li><li>Menu Bar</li><li>Display</li>
             </ul>
           </a>
 
           <a
             class="project-card"
-            href="https://github.com/scasella/Proofgrade"
-            data-categories="featured research utilities"
+            href="https://github.com/scasella/activation-probes-claim-correctness"
+            data-categories="featured research"
           >
             <div class="thumb screenshot-thumb">
               <img
-                src="assets/generated-screenshots/proofgrade.png"
+                src="assets/project-diagrams/activation-probes-claim-correctness.png"
                 alt=""
                 loading="lazy"
               >
             </div>
-            <h3>Proofgrade</h3>
-            <p>Grade proofs with AI. Instant feedback for students.</p>
+            <h3>activation-probes-claim-correctness</h3>
+            <p>Claim-level correctness probes on Llama hidden activations.</p>
             <ul class="tags" aria-label="Project tags">
-              <li>Education</li><li>AI</li><li>Web</li>
+              <li>Research</li><li>Interp</li><li>Probes</li>
+            </ul>
+          </a>
+
+          <a
+            class="project-card"
+            href="https://github.com/scasella/multi-model"
+            data-categories="featured research"
+          >
+            <div class="thumb screenshot-thumb">
+              <img
+                src="assets/project-diagrams/multi-model.png"
+                alt=""
+                loading="lazy"
+              >
+            </div>
+            <h3>multi-model</h3>
+            <p>Panel-of-experts scaffold vs native thinking on Qwen3-30B-A3B.</p>
+            <ul class="tags" aria-label="Project tags">
+              <li>Research</li><li>RLVR</li><li>Reasoning</li>
+            </ul>
+          </a>
+
+          <a
+            class="project-card"
+            href="https://github.com/scasella/society-of-thought-bench"
+            data-categories="featured research"
+          >
+            <div class="thumb screenshot-thumb">
+              <img
+                src="assets/project-diagrams/society-of-thought-bench.svg"
+                alt=""
+                loading="lazy"
+              >
+            </div>
+            <h3>society-of-thought-bench</h3>
+            <p>Multi-persona debate benchmark with traces, evidence, and a live demo.</p>
+            <ul class="tags" aria-label="Project tags">
+              <li>Research</li><li>Reasoning</li><li>Debate</li>
             </ul>
           </a>
 
@@ -182,15 +183,15 @@
           >
             <div class="thumb screenshot-thumb">
               <img
-                src="assets/generated-screenshots/hypothesis-forge.png"
+                src="assets/project-diagrams/hypothesis-forge.svg"
                 alt=""
                 loading="lazy"
               >
             </div>
             <h3>hypothesis-forge</h3>
-            <p>Generate, connect, and evaluate research hypotheses.</p>
+            <p>RL environment for novel, evidence-grounded, falsifiable ideas.</p>
             <ul class="tags" aria-label="Project tags">
-              <li>Research</li><li>AI</li><li>Graph</li>
+              <li>Research</li><li>RL</li><li>Novelty</li>
             </ul>
           </a>
 
@@ -207,9 +208,28 @@
               >
             </div>
             <h3>adaptive-rag-rlm</h3>
-            <p>Adaptive RAG with reinforcement learning for better answers.</p>
+            <p>Verifiers RLM environment for adaptive recursive search over long corpora.</p>
             <ul class="tags" aria-label="Project tags">
               <li>Research</li><li>RAG</li><li>RL</li>
+            </ul>
+          </a>
+
+          <a
+            class="project-card"
+            href="https://github.com/scasella/TextDrop"
+            data-categories="featured macos utilities"
+          >
+            <div class="thumb screenshot-thumb">
+              <img
+                src="assets/readme-screenshots/textdrop.png"
+                alt=""
+                loading="lazy"
+              >
+            </div>
+            <h3>TextDrop</h3>
+            <p>Turn pasted text into files with one click.</p>
+            <ul class="tags" aria-label="Project tags">
+              <li>macOS</li><li>Files</li><li>Utility</li>
             </ul>
           </a>
 
@@ -220,15 +240,262 @@
           >
             <div class="thumb screenshot-thumb">
               <img
-                src="assets/generated-screenshots/ttt-discover-autoresearch-mlx.png"
+                src="assets/project-diagrams/ttt-discover-autoresearch-mlx.svg"
                 alt=""
                 loading="lazy"
               >
             </div>
             <h3>ttt-discover-autoresearch-mlx</h3>
-            <p>Autonomous research agent with MLX at the core.</p>
+            <p>Local-first MLX version of TTT-Discover AutoResearch.</p>
             <ul class="tags" aria-label="Project tags">
-              <li>AI Agents</li><li>Research</li><li>MLX</li>
+              <li>Research</li><li>MLX</li><li>Agents</li>
+            </ul>
+          </a>
+
+          <a
+            class="project-card"
+            href="https://github.com/scasella/TabPilot"
+            data-categories="featured macos utilities"
+          >
+            <div class="thumb screenshot-thumb">
+              <img
+                src="assets/readme-screenshots/tabpilot.png"
+                alt=""
+                loading="lazy"
+              >
+            </div>
+            <h3>TabPilot</h3>
+            <p>Safari tab command center powered by Codex App Server.</p>
+            <ul class="tags" aria-label="Project tags">
+              <li>macOS</li><li>Safari</li><li>Tabs</li>
+            </ul>
+          </a>
+
+          <a
+            class="project-card"
+            href="https://github.com/scasella/SafariMarkdown"
+            data-categories="featured macos utilities"
+          >
+            <div class="thumb screenshot-thumb">
+              <img
+                src="assets/readme-screenshots/safarimarkdown.png"
+                alt=""
+                loading="lazy"
+              >
+            </div>
+            <h3>SafariMarkdown</h3>
+            <p>Convert any Safari tab to clean Markdown in one click.</p>
+            <ul class="tags" aria-label="Project tags">
+              <li>macOS</li><li>Safari</li><li>Markdown</li>
+            </ul>
+          </a>
+
+          <a
+            class="project-card"
+            href="https://github.com/scasella/Proofgrade"
+            data-categories="featured research"
+          >
+            <div class="thumb screenshot-thumb">
+              <img
+                src="assets/project-diagrams/proofgrade.svg"
+                alt=""
+                loading="lazy"
+              >
+            </div>
+            <h3>Proofgrade</h3>
+            <p>Reproducible LLM proof grading benchmark and API for math.</p>
+            <ul class="tags" aria-label="Project tags">
+              <li>Research</li><li>Math</li><li>API</li>
+            </ul>
+          </a>
+
+          <a
+            class="project-card"
+            href="https://github.com/scasella/GhostLabel"
+            data-categories="macos utilities"
+          >
+            <div class="thumb screenshot-thumb">
+              <img
+                src="assets/readme-screenshots/ghostlabel.png"
+                alt=""
+                loading="lazy"
+              >
+            </div>
+            <h3>GhostLabel</h3>
+            <p>Ghostty tab renamer powered by Codex App Server.</p>
+            <ul class="tags" aria-label="Project tags">
+              <li>macOS</li><li>Ghostty</li><li>Automation</li>
+            </ul>
+          </a>
+
+          <a
+            class="project-card"
+            href="https://github.com/scasella/PasteForge"
+            data-categories="macos utilities"
+          >
+            <div class="thumb screenshot-thumb">
+              <img
+                src="assets/readme-screenshots/pasteforge.png"
+                alt=""
+                loading="lazy"
+              >
+            </div>
+            <h3>PasteForge</h3>
+            <p>Clipboard text transformer with case, encode, format, hash, and stats tools.</p>
+            <ul class="tags" aria-label="Project tags">
+              <li>macOS</li><li>Clipboard</li><li>Utility</li>
+            </ul>
+          </a>
+
+          <a
+            class="project-card"
+            href="https://github.com/scasella/ClipDrop"
+            data-categories="macos utilities"
+          >
+            <div class="thumb screenshot-thumb">
+              <img
+                src="assets/readme-screenshots/clipdrop.png"
+                alt=""
+                loading="lazy"
+              >
+            </div>
+            <h3>ClipDrop</h3>
+            <p>Read clipboard text, edit it, and save to any file format.</p>
+            <ul class="tags" aria-label="Project tags">
+              <li>macOS</li><li>Clipboard</li><li>Files</li>
+            </ul>
+          </a>
+
+          <a
+            class="project-card"
+            href="https://github.com/scasella/DiskPulse"
+            data-categories="macos utilities"
+          >
+            <div class="thumb screenshot-thumb">
+              <img
+                src="assets/readme-screenshots/diskpulse.png"
+                alt=""
+                loading="lazy"
+              >
+            </div>
+            <h3>DiskPulse</h3>
+            <p>Per-volume disk space monitoring with color-coded usage bars.</p>
+            <ul class="tags" aria-label="Project tags">
+              <li>macOS</li><li>Storage</li><li>Monitor</li>
+            </ul>
+          </a>
+
+          <a
+            class="project-card"
+            href="https://github.com/scasella/PortSentry"
+            data-categories="macos utilities"
+          >
+            <div class="thumb screenshot-thumb">
+              <img
+                src="assets/readme-screenshots/portsentry.png"
+                alt=""
+                loading="lazy"
+              >
+            </div>
+            <h3>PortSentry</h3>
+            <p>See all listening TCP ports with one-click kill.</p>
+            <ul class="tags" aria-label="Project tags">
+              <li>macOS</li><li>Network</li><li>Utility</li>
+            </ul>
+          </a>
+
+          <a
+            class="project-card"
+            href="https://github.com/scasella/ProcessBeacon"
+            data-categories="macos utilities"
+          >
+            <div class="thumb screenshot-thumb">
+              <img
+                src="assets/readme-screenshots/processbeacon.png"
+                alt=""
+                loading="lazy"
+              >
+            </div>
+            <h3>ProcessBeacon</h3>
+            <p>Monitor long-running processes and get notified on completion.</p>
+            <ul class="tags" aria-label="Project tags">
+              <li>macOS</li><li>Processes</li><li>Notify</li>
+            </ul>
+          </a>
+
+          <a
+            class="project-card"
+            href="https://github.com/scasella/BrewPilot"
+            data-categories="macos utilities"
+          >
+            <div class="thumb screenshot-thumb">
+              <img
+                src="assets/readme-screenshots/brewpilot.png"
+                alt=""
+                loading="lazy"
+              >
+            </div>
+            <h3>BrewPilot</h3>
+            <p>Manage Homebrew services. Start, stop, and restart with one click.</p>
+            <ul class="tags" aria-label="Project tags">
+              <li>macOS</li><li>Homebrew</li><li>Services</li>
+            </ul>
+          </a>
+
+          <a
+            class="project-card"
+            href="https://github.com/scasella/gemma4-m4-pro"
+            data-categories="research"
+          >
+            <div class="thumb screenshot-thumb">
+              <img
+                src="assets/project-diagrams/gemma4-m4-pro.svg"
+                alt=""
+                loading="lazy"
+              >
+            </div>
+            <h3>gemma4-m4-pro</h3>
+            <p>Gemma 4 on a 24GB MacBook: measured recipes, runtimes, and fallback paths.</p>
+            <ul class="tags" aria-label="Project tags">
+              <li>Research</li><li>Gemma</li><li>Apple Silicon</li>
+            </ul>
+          </a>
+
+          <a
+            class="project-card"
+            href="https://github.com/scasella/train-gemma4-sudoku-on-your-macbook"
+            data-categories="research"
+          >
+            <div class="thumb screenshot-thumb">
+              <img
+                src="assets/readme-screenshots/train-gemma4-sudoku-on-your-macbook.png"
+                alt=""
+                loading="lazy"
+              >
+            </div>
+            <h3>train-gemma4-sudoku-on-your-macbook</h3>
+            <p>One-notebook Gemma 4 RL on Apple Silicon.</p>
+            <ul class="tags" aria-label="Project tags">
+              <li>Research</li><li>RL</li><li>Notebook</li>
+            </ul>
+          </a>
+
+          <a
+            class="project-card"
+            href="https://github.com/scasella/autoresearch-evo"
+            data-categories="research"
+          >
+            <div class="thumb screenshot-thumb">
+              <img
+                src="assets/project-diagrams/autoresearch-evo.svg"
+                alt=""
+                loading="lazy"
+              >
+            </div>
+            <h3>autoresearch-evo</h3>
+            <p>Novelty-search-inspired autonomous search with run memory and agentic review.</p>
+            <ul class="tags" aria-label="Project tags">
+              <li>Research</li><li>Agents</li><li>Search</li>
             </ul>
           </a>
         </section>
