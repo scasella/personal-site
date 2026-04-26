@@ -193,17 +193,32 @@ a {
   text-wrap: balance;
 }
 
-.research-links {
+.research-blog {
   max-width: 910px;
   margin: var(--content-rhythm) 0;
+  border-block: 1px solid var(--line);
+}
+
+.research-blog > h2 {
+  margin: 0;
+  padding: 12px 0 10px;
+  color: #6d6a65;
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.22em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.research-links {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  border-block: 1px solid var(--line);
+  border-top: 1px solid var(--line);
 }
 
 .research-link {
   display: block;
-  padding: 16px 18px 15px 0;
+  padding: 14px 18px 14px 0;
   color: inherit;
   transition: color 160ms ease, background 160ms ease;
 }
@@ -218,7 +233,7 @@ a {
   background: rgba(255, 255, 255, 0.24);
 }
 
-.research-link h2 {
+.research-link h3 {
   margin: 0;
   font-size: 15px;
   line-height: 1.2;
