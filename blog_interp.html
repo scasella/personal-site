@@ -3,11 +3,82 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Hidden activations know when self-report does not</title>
+  <title>Hidden Activations Know When Self-Report Does Not | Stephen Casella</title>
   <meta name="description" content="A claim-level uncertainty study: Llama 3.1 8B's structured confidence is near-random on MAUD legal QA and FActScore biographies. A linear readout of layer-19 residual activations recovers correctness signal that the model's own answer does not surface." />
+  <meta name="author" content="Stephen Casella" />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#F9F9F6" />
+  <link rel="canonical" href="https://casella.dev/blog_interp.html" />
+  <meta property="og:site_name" content="Stephen Casella" />
   <meta property="og:title" content="Hidden activations know when self-report does not" />
   <meta property="og:description" content="Linear probes on Llama residual activations recover claim-level correctness signal that structured self-report misses across MAUD and FActScore." />
   <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://casella.dev/blog_interp.html" />
+  <meta property="og:image" content="https://casella.dev/assets/project-diagrams/activation-probes-claim-correctness.png" />
+  <meta property="og:image:secure_url" content="https://casella.dev/assets/project-diagrams/activation-probes-claim-correctness.png" />
+  <meta property="og:image:width" content="900" />
+  <meta property="og:image:height" content="600" />
+  <meta property="og:image:alt" content="Diagram showing claims, hidden activations, a linear probe, and claim-level correctness scores" />
+  <meta property="article:author" content="Stephen Casella" />
+  <meta property="article:published_time" content="2026-04-25" />
+  <meta property="article:modified_time" content="2026-04-26" />
+  <meta property="article:tag" content="mechanistic interpretability" />
+  <meta property="article:tag" content="activation probes" />
+  <meta property="article:tag" content="claim-level correctness" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Hidden activations know when self-report does not" />
+  <meta name="twitter:description" content="Linear probes on Llama residual activations recover claim-level correctness signal that structured self-report misses." />
+  <meta name="twitter:image" content="https://casella.dev/assets/project-diagrams/activation-probes-claim-correctness.png" />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-2RSWDWW67D"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-2RSWDWW67D');
+  </script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Hidden activations know when self-report does not",
+      "description": "Linear probes on Llama residual activations recover claim-level correctness signal that structured self-report misses across MAUD and FActScore.",
+      "url": "https://casella.dev/blog_interp.html",
+      "mainEntityOfPage": "https://casella.dev/blog_interp.html",
+      "image": "https://casella.dev/assets/project-diagrams/activation-probes-claim-correctness.png",
+      "datePublished": "2026-04-25",
+      "dateModified": "2026-04-26",
+      "author": {
+        "@type": "Person",
+        "name": "Stephen Casella",
+        "url": "https://casella.dev/",
+        "sameAs": [
+          "https://github.com/scasella",
+          "https://www.linkedin.com/in/stevecasella/"
+        ]
+      },
+      "publisher": {
+        "@type": "Person",
+        "name": "Stephen Casella",
+        "url": "https://casella.dev/"
+      },
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "Stephen Casella",
+        "url": "https://casella.dev/"
+      },
+      "keywords": [
+        "activation probes",
+        "mechanistic interpretability",
+        "claim-level correctness",
+        "Llama 3.1",
+        "FActScore",
+        "MAUD"
+      ],
+      "codeRepository": "https://github.com/scasella/activation-probes-claim-correctness"
+    }
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
@@ -453,89 +524,11 @@
       letter-spacing: 0.6em;
     }
 
-    .site-footer {
-      background: var(--accent);
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      margin-top: auto;
-      padding: 0;
-    }
-    .site-footer .footer-inner {
-      max-width: 720px;
-      width: 100%;
-      margin: 2rem auto 0;
-      padding: 0 2rem 140px;
-    }
-    .footer-subscribe {
-      display: flex;
-      flex-direction: column;
-      gap: 1lh;
-      max-width: 480px;
-    }
-    .footer-subscribe-label {
-      font-size: 17px;
-      font-weight: 400;
-      line-height: 1.5;
-      color: var(--on-dark);
-      display: block;
-    }
-    .footer-subscribe-row {
-      display: flex;
-      align-items: stretch;
-      gap: 8px;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.18);
-      border-radius: 999px;
-      padding: 4px;
-      transition: border-color 150ms ease, background 150ms ease;
-    }
-    .footer-subscribe-row:focus-within {
-      border-color: rgba(255,255,255,0.45);
-      background: rgba(255,255,255,0.12);
-    }
-    .footer-subscribe-input {
-      flex: 1;
-      min-width: 0;
-      background: transparent;
-      border: 0;
-      outline: none;
-      padding: 0.6rem 1rem;
-      font-family: var(--font-serif);
-      font-size: 16px;
-      font-weight: 300;
-      color: #fff;
-    }
-    .footer-subscribe-input::placeholder { color: rgba(255,255,255,0.45); }
-    .footer-subscribe-button {
-      font-family: var(--font-sans);
-      font-size: 15px;
-      line-height: 1;
-      color: var(--accent);
-      background: #fff;
-      border: 0;
-      border-radius: 999px;
-      padding: 0 1.1rem;
-      cursor: pointer;
-      transition: background 150ms ease;
-    }
-    .footer-subscribe-button:hover { background: var(--surface-muted); }
-    .footer-meta {
-      font-family: var(--font-sans);
-      font-size: 12px;
-      color: var(--fg-faint);
-      margin-top: 2rem;
-      line-height: 1.6;
-    }
-    .footer-meta a { color: var(--on-dark); text-decoration: none; border-bottom: 1px dotted rgba(255,255,255,0.25); }
-    .footer-meta a:hover { color: #fff; border-bottom-color: #fff; }
-
     @media (max-width: 768px) {
       .perspectives-header { padding: 1.5rem 1.5rem; }
       .benchmarks-content { padding: 3rem 1.5rem 4rem; }
       .benchmarks-content h1 { font-size: 44px; margin-top: 120px; }
       .benchmarks-body { margin: 72px 0 32px; }
-      .site-footer .footer-inner { padding-left: 1.5rem; padding-right: 1.5rem; }
     }
     @media (max-width: 480px) {
       .perspectives-header { padding: 1.25rem 1.25rem; }
@@ -548,7 +541,6 @@
       .benchmarks-body li { font-size: 18px; }
       .tldr p { font-size: 18px; }
       .stat .v { font-size: 24px; }
-      .site-footer .footer-inner { padding: 0 1.25rem 80px; }
     }
   </style>
 </head>
@@ -584,7 +576,7 @@
               </p>
             </div>
 
-            <h2 id="question">The question we couldn't skip</h2>
+            <h2 id="question">When self-report is not enough</h2>
 
             <p>
               Long answers fail locally. One sentence is right, the next is partly right, the next is confidently wrong. A user who depends on the answer needs to know which is which. A single answer-level confidence number is not enough.
@@ -1163,24 +1155,6 @@
         </div>
       </article>
     </main>
-
-    <footer class="site-footer">
-      <div class="footer-inner">
-        <form class="footer-subscribe" novalidate>
-          <label class="footer-subscribe-label" for="footer-email">Get early access to research, products, and more.</label>
-          <div class="footer-subscribe-row">
-            <input class="footer-subscribe-input" type="email" id="footer-email" name="email" placeholder="you@example.com" autocomplete="email" required />
-            <button class="footer-subscribe-button" type="submit">Subscribe</button>
-          </div>
-          <p class="footer-subscribe-status" role="status" aria-live="polite"></p>
-        </form>
-        <div class="footer-meta">
-          Stephen Casella &middot; interp lab &middot; Apr 25, 2026<br />
-          Model: Llama 3.1 8B Instruct &middot; layer: 19 residual stream &middot; labels: MAUD judge-proxy + FActScore human atomic facts<br />
-          Artifacts: <a href="paper_draft.md">paper draft</a> &middot; <a href="../artifacts/runs/maud_bootstrap_ci_v2.json">MAUD CIs</a> &middot; <a href="../artifacts/runs/factscore_bootstrap_ci.json">FActScore CIs</a> &middot; <a href="../artifacts/runs/felm_wk_bootstrap_ci.json">FELM CIs</a>
-        </div>
-      </div>
-    </footer>
 
   </div>
 </body>
