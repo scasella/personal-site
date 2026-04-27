@@ -679,7 +679,7 @@
 
             <h3>The baseline</h3>
             <p>
-              Qwen's production thinking model. Same base architecture, same parameter count, full proprietary post-training stack. We access it through <code>apply_chat_template(enable_thinking=True)</code>, which routes the request to the post-trained policy that emits <code>&lt;think&gt;…&lt;/think&gt;</code> before the answer. It is the closest peer the architecture allows.
+              Qwen's production thinking model. Same base architecture, same parameter count, full proprietary post-training stack. I access it through <code>apply_chat_template(enable_thinking=True)</code>, which routes the request to the post-trained policy that emits <code>&lt;think&gt;…&lt;/think&gt;</code> before the answer. It is the closest peer the architecture allows.
             </p>
 
             <div class="callout">
@@ -706,14 +706,14 @@
               <div class="stat">
                 <span class="k">Post-train ratio</span>
                 <div class="v">~10⁴–10⁵×</div>
-                <div class="s">Baseline vs ours · conservative</div>
+                <div class="s">Baseline vs panel adapter · conservative</div>
               </div>
             </div>
 
             <h2 id="method">Measuring "different reasoning"</h2>
 
             <p>
-              Diversity is one of those words that means too many things to be useful without an operational definition. The one we used: draw N completions from each model on the same problem at temperature 1.0, group them per problem and per model, and look at where they sit in semantic space relative to each other. A scaffold that explores more of the solution surface per sample should produce traces that sit further apart.
+              Diversity is one of those words that means too many things to be useful without an operational definition. The one I used: draw N completions from each model on the same problem at temperature 1.0, group them per problem and per model, and look at where they sit in semantic space relative to each other. A scaffold that explores more of the solution surface per sample should produce traces that sit further apart.
             </p>
 
             <div class="mode-grid">
@@ -842,7 +842,7 @@
 
                 <line x1="370" y1="78" x2="402" y2="78" stroke="#3B3B39" stroke-width="2" />
                 <text x="408" y="82" fill="#3B3B39"
-                      font-family="Inter, Helvetica Neue, sans-serif" font-size="12">panel (ours)</text>
+                      font-family="Inter, Helvetica Neue, sans-serif" font-size="12">panel adapter</text>
                 <line x1="498" y1="78" x2="530" y2="78" stroke="#969592" stroke-width="2" stroke-dasharray="4 3" />
                 <text x="536" y="82" fill="#3B3B39"
                       font-family="Inter, Helvetica Neue, sans-serif" font-size="12">Qwen3 thinking</text>
@@ -951,17 +951,17 @@
 
             <div class="callout">
               <span class="callout-label">What the result is not</span>
-              <p>Per-sample accuracy on the panel is lower than on thinking: about 33 pp lower on MATH500 L5, about 51 pp lower on AIME. In the k range we tested the curves converge but never cross. On AIME, panel solves a strict subset of what thinking solves (11/20 vs 18/20, no panel-only wins). The MATH RL stage also compressed diversity from 0.174 to 0.095; the released checkpoint is an exploration–reliability compromise, not a pure-diversity win.</p>
+              <p>Per-sample accuracy on the panel is lower than on thinking: about 33 pp lower on MATH500 L5, about 51 pp lower on AIME. In the k range I tested, the curves converge but never cross. On AIME, panel solves a strict subset of what thinking solves (11/20 vs 18/20, no panel-only wins). The MATH RL stage also compressed diversity from 0.174 to 0.095; the released checkpoint is an exploration–reliability compromise, not a pure-diversity win.</p>
             </div>
 
             <p>
-              The reviewer question we'd most like answered next: is the effect the scaffold, or is it our specific RL recipe? Answering it requires a matched-compute <code>&lt;think&gt;</code>-scaffolded LoRA trained with the same reward, same step count, same base. That experiment is still open.
+              The reviewer question I most want answered next: is the effect the scaffold, or is it my specific RL recipe? Answering it requires a matched-compute <code>&lt;think&gt;</code>-scaffolded LoRA trained with the same reward, same step count, same base. That experiment is still open.
             </p>
 
             <h2 id="rlvr">From wider search to faster hill-climbing</h2>
 
             <p>
-              The original draft promised a third benchmark as the next step. The follow-up went further than that. Instead of a pass@k re-replication on a new dataset, we asked whether the per-sample diversity converts into gradient signal under RLVR.
+              The original draft promised a third benchmark as the next step. The follow-up went further than that. Instead of a pass@k re-replication on a new dataset, I asked whether the per-sample diversity converts into gradient signal under RLVR.
             </p>
             <p>
               Group-relative RLVR (GRPO, RLOO) only produces non-zero advantage when a group of rollouts on the same problem contains both correct and incorrect samples. The <em>variance band</em> — problems with 0 &lt; pass@G &lt; 1 — is therefore the only regime that contributes to the policy gradient. Wider per-sample search predicts a wider variance band: more rollouts that fall outside both ceilings, more problems with usable advantage, more trainable data.
@@ -1063,7 +1063,7 @@
             <h3>Panel hill-climbs on its own variance band</h3>
 
             <p>
-              Only the panel arm reached step 100. At ~17× the per-rollout token cost, the matched 100-step thinking run would have taken about 37 hours of Tinker compute against panel's ~2.6, and we hit a billing wall about three hours in. The panel trajectory:
+              Only the panel arm reached step 100. At ~17× the per-rollout token cost, the matched 100-step thinking run would have taken about 37 hours of Tinker compute against panel's ~2.6, and I hit a billing wall about three hours in. The panel trajectory:
             </p>
 
             <figure class="chart">
@@ -1207,7 +1207,7 @@
             <h3>Diversity through RL — entropy collapses, length-spread doesn't</h3>
 
             <p>
-              RL is a known diversity-killer. The natural worry was that 100 steps of RLVR would collapse the policy distribution and quietly erase the property the scaffold was chosen for. We tracked two diversity proxies across the run: per-token policy entropy, and trajectory-length spread within a group of 16 rollouts on the same problem.
+              RL is a known diversity-killer. The natural worry was that 100 steps of RLVR would collapse the policy distribution and quietly erase the property the scaffold was chosen for. I tracked two diversity proxies across the run: per-token policy entropy, and trajectory-length spread within a group of 16 rollouts on the same problem.
             </p>
 
             <div class="stat-row">
@@ -1246,8 +1246,8 @@
             <div class="neg-list">
               <span class="neg-list-label">Honest scope</span>
               <ul>
-                <li><strong>Does say:</strong> the variance-band advantage the diversity claim predicts is real (382 vs 209 on the 877-problem pool). It converts to RL gradient signal: 100 steps double panel's olympiad held-out pass rate (14% → 29%), with per-source gains scaling with training-pool representation. The diversity reservoir survives the run on the proxy we measured — per-token entropy collapses, but length spread within a group grows.</li>
-                <li><strong>Does not say:</strong> the matched <code>&lt;think&gt;</code> RL comparison ran to completion. At ~17× the per-rollout token cost, the matched 100-step thinking run would have taken about 37 hours of Tinker compute, and we hit the billing wall first. The static reference is vanilla Qwen3-thinking on the shared held-out: ~60% pass@1 aggregate, ~55% on OlympiadBench, ~75% on AMC, all at G=8. Panel ends at 29%, about half. The result here is about rate of climb under matched hyperparameters, not absolute capability.</li>
+                <li><strong>Does say:</strong> the variance-band advantage the diversity claim predicts is real (382 vs 209 on the 877-problem pool). It converts to RL gradient signal: 100 steps double panel's olympiad held-out pass rate (14% → 29%), with per-source gains scaling with training-pool representation. The diversity reservoir survives the run on the proxy I measured — per-token entropy collapses, but length spread within a group grows.</li>
+                <li><strong>Does not say:</strong> the matched <code>&lt;think&gt;</code> RL comparison ran to completion. At ~17× the per-rollout token cost, the matched 100-step thinking run would have taken about 37 hours of Tinker compute, and I hit the billing wall first. The static reference is vanilla Qwen3-thinking on the shared held-out: ~60% pass@1 aggregate, ~55% on OlympiadBench, ~75% on AMC, all at G=8. Panel ends at 29%, about half. The result here is about rate of climb under matched hyperparameters, not absolute capability.</li>
                 <li><strong>Single seed, single run:</strong> the +15 pp number is one seed. The curve's shape replicates across the per-source breakdown; the absolute number wants a second seed before its CI gets reported.</li>
               </ul>
             </div>
@@ -1270,12 +1270,12 @@
 
             <h3>Held-out diversity post-RL</h3>
             <p>
-              We measured RL-time entropy (collapsed) and length CV (grew). The semantic measurement on a post-RL checkpoint, the same mpnet-cosine pipeline that produced the +78% and +76% numbers earlier, is the missing piece. If those numbers survive 100 steps of RL, the scaffold's diversity is a stable equilibrium under gradient pressure rather than a starting condition.
+              I measured RL-time entropy (collapsed) and length CV (grew). The semantic measurement on a post-RL checkpoint, the same mpnet-cosine pipeline that produced the +78% and +76% numbers earlier, is the missing piece. If those numbers survive 100 steps of RL, the scaffold's diversity is a stable equilibrium under gradient pressure rather than a starting condition.
             </p>
 
             <h3>Scaling study on n</h3>
             <p>
-              Does the gap-closure curve keep tightening past the sample budgets we tried? Pushing panel to n=64 or n=128 on the L5 slice gives the asymptote, which decides between "diversity that eventually catches up" and "diversity that plateaus below thinking." Current data points to the latter. The slope at n=16 is not zero.
+              Does the gap-closure curve keep tightening past the sample budgets I tried? Pushing panel to n=64 or n=128 on the L5 slice gives the asymptote, which decides between "diversity that eventually catches up" and "diversity that plateaus below thinking." Current data points to the latter. The slope at n=16 is not zero.
             </p>
 
             <div class="break">· · ·</div>

@@ -794,7 +794,7 @@
             <h2 id="judges">Second judge &mdash; does the ordering survive?</h2>
 
             <p>
-              MAUD's first labels come from a GPT-5.4 judge-proxy protocol. Probes trained on those labels could be fitting whatever GPT-5.4 happens to score consistently rather than something more general. The cleanest test is to relabel the same fixed claims with a different judge family and rescore the same probes without retraining. We use Kimi K2.6 through Prime Intellect Inference, with the prompt structure and claim serialization preserved.
+              MAUD's first labels come from a GPT-5.4 judge-proxy protocol. Probes trained on those labels could be fitting whatever GPT-5.4 happens to score consistently rather than something more general. The cleanest test is to relabel the same fixed claims with a different judge family and rescore the same probes without retraining. I use Kimi K2.6 through Prime Intellect Inference, with the prompt structure and claim serialization preserved.
             </p>
 
             <figure class="chart">
@@ -1067,7 +1067,7 @@
             </p>
 
             <p>
-              The interesting finding in FELM is not the held-out AUROC. It is what happened when we tried to repair the annotation. Llama-generated FELM-style answers go beyond FELM's curated reference snippets often enough that calling them <code>false</code> against those snippets is the wrong target. We added fuller readability-extracted references and a fourth <code>not_enough_evidence</code> label. The repaired pilot's 52 segments came back like this:
+              The interesting finding in FELM is not the held-out AUROC. It is what happened when I tried to repair the annotation. Llama-generated FELM-style answers go beyond FELM's curated reference snippets often enough that calling them <code>false</code> against those snippets is the wrong target. I added fuller readability-extracted references and a fourth <code>not_enough_evidence</code> label. The repaired pilot's 52 segments came back like this:
             </p>
 
             <div class="stat-row">
@@ -1094,7 +1094,7 @@
             </div>
 
             <p>
-              <code>not_enough_evidence</code> at 57.7% is not noise. It is a structural finding: when generated claims exceed the reference scope, a reference-bounded annotator cannot adjudicate them. The label tells us whether the bundle supports the claim, not whether the claim is true. That is a coverage measurement, not a correctness measurement, and it is the wrong target for a probe trained on claim correctness. We therefore did not scale the matched-generation FELM run; instead, FELM stays in the paper as a documented boundary that explains why label provenance matters more than domain similarity.
+              <code>not_enough_evidence</code> at 57.7% is not noise. It is a structural finding: when generated claims exceed the reference scope, a reference-bounded annotator cannot adjudicate them. The label tells me whether the bundle supports the claim, not whether the claim is true. That is a coverage measurement, not a correctness measurement, and it is the wrong target for a probe trained on claim correctness. I therefore did not scale the matched-generation FELM run; instead, FELM stays in the paper as a documented boundary that explains why label provenance matters more than domain similarity.
             </p>
 
             <h2 id="lesson">The methodological lesson</h2>
@@ -1145,7 +1145,7 @@
             <div class="break">&middot; &middot; &middot;</div>
 
             <p>
-              The result is a bounded interpretability win. A linear readout of hidden activations sees something the model's own structured confidence misses, and the gap is the same size on legal QA and on biography factuality. It does not give us a compact SAE feature story, a legal-truth adjudicator, or a domain-general hallucination detector.
+              The result is a bounded interpretability win. A linear readout of hidden activations sees something the model's own structured confidence misses, and the gap is the same size on legal QA and on biography factuality. It does not provide a compact SAE feature story, a legal-truth adjudicator, or a domain-general hallucination detector.
             </p>
             <p>
               The remaining questions sit on label provenance and matched-generation transfer, not on probe architecture. Downstream tools building on this should expose claim construction and label-provenance assumptions to users, rather than hiding them behind opaque confidence scores. The probe is only as honest as the labels it was trained on.
