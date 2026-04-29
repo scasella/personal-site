@@ -8,6 +8,7 @@
   --pill: #f3f2ef;
   --shadow: 0 16px 50px rgba(26, 24, 21, 0.06);
   --content-rhythm: 18px;
+  --footer-reserve: 58px;
   color-scheme: light;
 }
 
@@ -22,7 +23,7 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
-  padding-bottom: 58px;
+  padding-bottom: var(--footer-reserve);
   background:
     radial-gradient(circle at 16% 18%, rgba(239, 233, 222, 0.45), transparent 22%),
     radial-gradient(circle at 81% 16%, rgba(240, 238, 231, 0.4), transparent 23%),
@@ -295,6 +296,12 @@ a {
   grid-template-columns: repeat(auto-fit, minmax(238px, 1fr));
   margin: 0;
   gap: 11px 12px;
+  max-height: var(--projects-grid-max-height, calc(100vh - 610px));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-bottom: 12px;
+  scrollbar-gutter: stable;
+  -webkit-overflow-scrolling: touch;
 }
 
 .project-card {
@@ -1159,6 +1166,10 @@ button:focus-visible {
   .hero-copy h1 {
     font-size: clamp(36px, 3.4vw, 46px);
   }
+
+  .projects-grid {
+    max-height: var(--projects-grid-max-height, calc(100vh - 590px));
+  }
 }
 
 @media (max-width: 980px) {
@@ -1210,6 +1221,10 @@ button:focus-visible {
     padding-top: 0;
     justify-content: flex-start;
   }
+
+  .projects-grid {
+    max-height: var(--projects-grid-max-height, calc(100vh - 612px));
+  }
 }
 
 @media (max-width: 680px) {
@@ -1256,6 +1271,7 @@ button:focus-visible {
   .bio {
     margin-top: 22px;
     font-size: 14px;
+    text-align: center;
   }
 
   .hero-copy h1 {
@@ -1291,6 +1307,7 @@ button:focus-visible {
 
   .projects-grid {
     grid-template-columns: 1fr;
+    max-height: var(--projects-grid-max-height, calc(100vh - 612px));
   }
 
   .project-card h3 {
