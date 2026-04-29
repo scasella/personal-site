@@ -267,13 +267,13 @@ a {
   background: rgba(255, 255, 255, 0.68);
   color: #424242;
   border-radius: 999px;
-  min-width: 78px;
-  height: 32px;
-  padding: 0 14px;
+  min-height: 34px;
+  padding: 8px 14px;
   font: inherit;
   font-size: 13px;
-  line-height: 1;
+  line-height: 1.15;
   cursor: pointer;
+  text-align: center;
   transition: background 170ms ease, color 170ms ease, border-color 170ms ease, transform 170ms ease;
 }
 
@@ -320,6 +320,10 @@ a {
   display: none;
 }
 
+.collaboration-card {
+  justify-content: flex-start;
+}
+
 .thumb {
   position: relative;
   width: 100%;
@@ -341,6 +345,31 @@ a {
   height: 100%;
   object-fit: cover;
   object-position: top center;
+}
+
+.collaboration-thumb {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: center;
+  gap: 8px;
+  aspect-ratio: auto;
+  height: 112px;
+  padding: 18px;
+  background: linear-gradient(135deg, #f7f4ee, #ece8df);
+}
+
+.collaboration-thumb span {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  min-height: 42px;
+  border: 1px solid #ded8cc;
+  border-radius: 999px;
+  color: #333;
+  background: rgba(255, 255, 255, 0.52);
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 1;
 }
 
 .project-card h3 {
@@ -381,11 +410,42 @@ a {
   white-space: nowrap;
 }
 
+.collaboration-links {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: auto 2px 0;
+  padding-top: 12px;
+}
+
+.collaboration-links a {
+  border-radius: 999px;
+  background: var(--pill);
+  color: #333;
+  min-height: 24px;
+  padding: 5px 11px;
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.15;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.collaboration-links a:hover {
+  background: #111;
+  color: #fff;
+}
+
 .site-footer {
   color: #9a9a9a;
   font-size: 12px;
   text-align: center;
-  margin-top: 0;
+  line-height: 1.5;
+  margin: 18px auto 0;
+  max-width: 760px;
+}
+
+.site-footer p {
+  margin: 0;
 }
 
 a:focus-visible,
@@ -1217,7 +1277,8 @@ button:focus-visible {
   .filter-pill {
     min-width: auto;
     flex: 1 1 44%;
-    height: 40px;
+    min-height: 40px;
+    padding: 9px 10px;
     font-size: 14px;
   }
 
