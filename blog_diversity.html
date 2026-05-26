@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>The diversity that post-training removes is recoverable at near-zero cost</title>
+  <title>A tiny RL pass recovers cross-task answer diversity in an instruction-tuned model</title>
   <meta name="description" content="A targeted reinforcement-learning pass on Qwen3-30B-A3B-Instruct restored output diversity across ten distinct tasks while leaving knowledge and reasoning benchmarks intact." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -152,7 +152,7 @@
   </header>
   <article>
     <p class="meta">May 2026</p>
-    <h1>The diversity that post-training removes is recoverable at near-zero cost</h1>
+    <h1>A tiny RL pass recovers cross-task answer diversity in an instruction-tuned model</h1>
     <p class="subtitle">A targeted reinforcement-learning pass on Qwen3-30B-A3B-Instruct restored output diversity across ten distinct tasks while leaving knowledge and reasoning benchmarks intact.</p>
 
     <div class="tldr">
@@ -287,6 +287,7 @@
     <p>You can fine-tune a model for each task you care about. I did not. I trained on one task and nine others improved. A per-task fine-tune would mean nine more training runs.</p>
     <p>The cheapest task-specific fix needs no training at all: post-hoc <em>logit correction</em>. Subtract a per-choice bias from the model's output scores so the resulting distribution lands flat on whichever task you fit it to. I ran that as a baseline. On any single task it sets diversity to zero. But the bias vector for "pick an integer 1&ndash;100" has no defined meaning on "pick a color." Logit correction cannot transfer across tasks. The only way to get the result I measured is a parameter update that touches something the model represents <em>across</em> these tasks.</p>
     <p>One training pass adjusted something the model uses for all ten of these tasks, not only the trained one. I don't know exactly what. The likely-but-unproven story: post-training nudges some shared internal setting toward narrower outputs across the board, and a short RL pass with a "reward more spread" signal nudges it back. The evidence is consistent with that. I have not isolated which weights changed.</p>
+    <p>Inference-time methods (contrastive decoding, base-model-assisted decoding) can also pull an instruct model's output distribution toward a more spread reference without retraining. They keep two models in the serving path and pay the cost at every sample. A weight-level adjustment is paid once. I have not run a head-to-head comparison; either approach may be the right tool for a given deployment.</p>
 
     <h2>Per-task numbers</h2>
     <table>
@@ -307,7 +308,9 @@
 
     <h2>Bounds</h2>
     <p>This is one intervention on one model. I tested one open-weight family (Qwen3) at one size (30B total parameters, 3B active per token), trained on one task from a ten-task panel, and evaluated against a subset of standard capability benchmarks. Replicate with the model you ship before betting product strategy on the finding.</p>
-    <p>Three things I stand behind: the direction of the effect, the cross-task transfer, and the fact that knowledge and reasoning held steady across the benchmarks I ran.</p>
+    <p>What's measured is total variation distance from uniform: distribution flattening, not necessarily useful diversity. For finite dice-like prompts (integers, card suits) uniform over valid answers is the right target. For open semantic domains (fruit, animal, word) "uniform over every valid answer" is not obviously what a product wants. The result restores entropy across categorical prompts; whether the recovered diversity helps a downstream workload is a separate question this post does not answer.</p>
+    <p>Knowledge and reasoning held steady on MMLU (200 questions) and GSM8K (50 problems). Those are smoke tests, not a deployment screen. A diversity-restoration update could affect instruction-following, calibration, safety behavior, tool-use reliability, or JSON formatting without moving either benchmark. The training compute was about $25; the operational cost of shipping a forked model (regression testing, safety review, version management) is separate and not free.</p>
+    <p>Three things I stand behind: the direction of the effect, the cross-task transfer on these categorical prompts, and the fact that knowledge and reasoning held steady across the benchmarks I ran.</p>
 
     <h2>Close</h2>
     <p>The conventional story about RLHF: it makes models better behaved at the cost of creativity, and the trade-off is fundamental. The trade-off is local. Fifty training steps on one task recover the diversity. Knowledge and reasoning hold.</p>

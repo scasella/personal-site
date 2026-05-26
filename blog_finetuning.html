@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>A 1.5B model went from zero correct fixes to cross-category transfer with ten examples</title>
+  <title>Verifier-guided prompt mining turned a zero-success 1.5B model into a transferable bug fixer with ten LoRA examples</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -151,8 +151,8 @@
   </header>
   <article>
     <p class="meta">May 2026</p>
-    <h1>A 1.5B model went from zero correct fixes to cross-category transfer with ten examples</h1>
-    <p class="subtitle">A small open-weight coding model produced zero correct fixes across 384 attempts at a synthetic Python bug-fix task. A prompt-optimization pass mined ten verified-correct fixes from the same model. A LoRA trained on those ten solved bug categories the model had never trained on.</p>
+    <h1>Verifier-guided prompt mining turned a zero-success 1.5B model into a transferable bug fixer with ten LoRA examples</h1>
+    <p class="subtitle">A small open-weight instruction model (Qwen2.5-1.5B-Instruct, not a code-specialized model) produced zero correct fixes across 384 attempts at a synthetic Python bug-fix task. A prompt-optimization pass mined ten verified-correct fixes from the same model. A LoRA trained on those ten solved bug categories the model had never trained on.</p>
 
     <div class="tldr">
       <div class="label">TL;DR</div>
@@ -163,6 +163,7 @@
     <h2>Where the training data already lives</h2>
     <p>The default story for adapting AI looks like this. Take an existing model, gather labeled examples of a new task, fine-tune the model on them, get a better model. The expensive part is the examples. Annotation companies exist to provide them, and synthetic-data pipelines exist to generate them. "We need more data" is the standard diagnosis when fine-tuning fails.</p>
     <p>I tested whether the apparent shortage was structural or a prompting failure. It was a prompting failure. The training pass that recovered the missing skill cost about thirty cents on a Modal L4 GPU.</p>
+    <p>"In the model" is a slight overstatement. The data is reachable from the model in interaction with a verifier and its failure messages, not by the deployment prompt on its own. The model plus the verifier-feedback loop is where the data lives. That distinction matters because the verifier shapes what counts as correct, and (as the chart below shows) the quality of the feedback the optimizer sees changes what the mined examples teach.</p>
 
     <details class="glossary">
       <summary>Terms used below</summary>
@@ -189,7 +190,7 @@
     <p>The approach does not apply when the deployment prompt is already producing correct outputs at a workable rate, or when no automated verifier exists for the task.</p>
 
     <h2>The result, in one chart</h2>
-    <p>The chart compares two ways of running the mining pass. In the <strong>scalar</strong> condition, the prompt-optimization search saw only the count of tests each prompt candidate passed. In the <strong>localized</strong> condition, the search saw per-test-case failures with assertion errors. Both pools yielded ten verified-correct fixes; both LoRAs used the same training recipe.</p>
+    <p>The chart compares two ways of running the mining pass. In the <strong>scalar</strong> condition, the prompt-optimization search saw only the count of tests each prompt candidate passed. In the <strong>localized</strong> condition, the search saw per-test-case failures with assertion errors. Both pools yielded ten verified-correct fixes; both LoRAs used the same training recipe. The transferability gap on held-out categories (3.67/6 vs 0.33/6) is the post's strongest practical lesson: diagnostic feedback quality, not just example count, determines whether mined examples teach generalizable behavior.</p>
     <figure class="chart">
       <svg viewBox="0 0 900 360" role="img" aria-label="Category-heldout repair success: scalar-feedback vs localized-feedback adapters across three random training samples and the mean">
         <rect x="0" y="0" width="900" height="360" fill="#ffffff" />
@@ -274,7 +275,8 @@
     </table>
 
     <h2>Bounds</h2>
-    <p>One intervention on one model. I tested one open-weight family at one size (1.5B parameters, instruction-tuned), trained on one synthetic Python code-repair benchmark with hidden pytest verification, and evaluated on a 38-task validation suite with 6 items in the toughest held-out-category split. Any individual number could move with a different random sample. I have not shown the result transfers to real codebases, larger models, multi-file bugs, or anything that is not code.</p>
+    <p>One intervention on one model. I tested one open-weight family at one size (1.5B parameters, instruction-tuned), trained on one synthetic Python code-repair benchmark with hidden pytest verification, and evaluated on a 38-task validation suite with 6 items in the toughest held-out-category split. Any individual number could move with a different random sample. The held-out tasks belong to bug categories the LoRA never saw, but they share the synthetic benchmark's task grammar, file structure, and hidden-test style. The claim is cross-category transfer inside a synthetic repair distribution, not broad code-repair generalization. I have not shown the result transfers to real codebases, larger models, multi-file bugs, or anything that is not code.</p>
+    <p>The most important baseline I have not run: take the same ten mined examples and use them as few-shot in the prompt, without LoRA. If few-shot prompting reaches similar held-out performance, the LoRA is mostly compression and deployment convenience. If LoRA beats few-shot under equal context cost, the adapter story is stronger. That comparison is open.</p>
     <p>Two things I stand behind. The direction of the result reproduced across three random training samples and a fresh seed/split mining package. The methodology, including the adapter overfit gate that caught a training-format bug before the matched-pool comparison ran, is reconstructible from the source artifacts.</p>
 
     <h2>Close</h2>
