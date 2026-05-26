@@ -96,7 +96,7 @@
       --on-dark:      #DFDEDA;
       --surface-muted:#EFEFEB;
 
-      /* Chart palette — muted earth tones, harmonised with body */
+      /* Chart palette, muted earth tones, harmonised with body */
       --chart-primary:   #3B3B39;
       --chart-secondary: #969592;
       --chart-axis:      #C8C7C2;
@@ -320,7 +320,7 @@
     pre .s { color: var(--fg); }
 
     /* ==========================================================
-       TL;DR — pulled-quote treatment
+       TL;DR, pulled-quote treatment
        ========================================================== */
     .tldr {
       margin: 32px 0 48px;
@@ -371,7 +371,7 @@
     }
 
     /* ==========================================================
-       Stat row — minimal numbers
+       Stat row, minimal numbers
        ========================================================== */
     .stat-row {
       display: grid;
@@ -616,7 +616,7 @@
       <article class="benchmarks-content">
 
         <h1>The diversity effect</h1>
-        <p class="subtitle">What a panel-of-experts scaffold does to RL-trained reasoning, and what happens when the diversity it produces meets RLVR on olympiad math.</p>
+        <p class="subtitle">A panel-of-experts scaffold changes RL-trained reasoning by widening per-sample search, then turns that diversity into RLVR signal on olympiad math.</p>
         <p class="date">STEPHEN CASELLA · APRIL 2026</p>
 
         <div class="paper-links">
@@ -630,17 +630,17 @@
             <div class="tldr">
               <span class="tldr-label">TL;DR</span>
               <p>
-                The same backbone, post-trained two ways. Trained as a panel of experts arguing inside a debate tag, it produces reasoning traces that sit <strong>+78.2%</strong> further apart in mpnet-space on MATH500 (paired t = 5.91, p &lt; 10⁻⁸) and <strong>+75.6%</strong> further apart on AIME (t = 4.72, p &lt; 10⁻⁵) than the same model post-trained to think privately. The pass@k gap to Qwen3-thinking narrows monotonically in k across three independent slices.
+                I post-trained the same backbone two ways. Trained as a panel of experts arguing inside a debate tag, it produces reasoning traces that sit <strong>+78.2%</strong> further apart in mpnet-space on MATH500 (paired t = 5.91, p &lt; 10⁻⁸) and <strong>+75.6%</strong> further apart on AIME (t = 4.72, p &lt; 10⁻⁵) than the same model post-trained to think privately. The pass@k gap to Qwen3-thinking narrows monotonically in k across three independent slices.
               </p>
               <p>
-                <strong>And the deployment-cost consequence.</strong> On the 374 paired draws across MATH500 L5 and AIME 24+25 where both arms produced a correct answer, thinking burns <strong>5.9–6.9× more tokens (median)</strong> than the panel — and is longer than the panel in <strong>99.6–99.7%</strong> of all paired draws regardless of correctness. At the cost-per-correct-answer level — total tokens divided by correct samples — thinking is <strong>2.5–5×</strong> more expensive than the panel. Per-sample accuracy still favors thinking; per-token efficiency reverses the comparison. The visceral version is a <a href="../case_study/gallery.html">20-problem side-by-side gallery</a> where the asymmetry is visible row by row. (Wilcoxon signed-rank: <em>p</em> = 6×10⁻⁵² on MATH, <em>p</em> = 8×10⁻¹³ on AIME.)
+                <strong>Deployment cost.</strong> On the 374 paired draws across MATH500 L5 and AIME 24+25 where both arms produced a correct answer, thinking uses <strong>5.9-6.9× more tokens (median)</strong> than the panel, and it runs longer than the panel in <strong>99.6-99.7%</strong> of all paired draws regardless of correctness. At the cost-per-correct-answer level, total tokens divided by correct samples, thinking is <strong>2.5-5×</strong> more expensive than the panel. Per-sample accuracy still favors thinking; per-token efficiency reverses the comparison. The <a href="../case_study/gallery.html">20-problem side-by-side gallery</a> shows the asymmetry row by row. (Wilcoxon signed-rank: <em>p</em> = 6×10⁻⁵² on MATH, <em>p</em> = 8×10⁻¹³ on AIME.)
               </p>
               <p>
-                <strong>Update — Apr 25.</strong> Wider per-sample search shows up where it matters for RL. On a fresh 877-problem olympiad pool the panel has 382 variance-band problems against thinking's 209: the only regime where group-relative RLVR generates non-zero gradient, and a <strong>1.83×</strong> ratio in panel's favor. 100 RL steps on that band carry panel from 14% to 29% on a shared held-out, with per-source gains scaling with training-pool representation. Training adapter: LoRA rank 32 on the frozen base, four to five orders of magnitude under the baseline's post-training compute.
+                <strong>Apr 25 update.</strong> Wider per-sample search shows up where it matters for RL. On a fresh 877-problem olympiad pool the panel has 382 variance-band problems against thinking's 209: the only regime where group-relative RLVR generates non-zero gradient, and a <strong>1.83×</strong> ratio in panel's favor. 100 RL steps on that band carry panel from 14% to 29% on a shared held-out, with per-source gains scaling with training-pool representation. Training adapter: LoRA rank 32 on the frozen base, four to five orders of magnitude under the baseline's post-training compute.
               </p>
             </div>
 
-            <h2 id="question">Is the scaffold doing real work?</h2>
+            <h2 id="question">Scaffold work, measured</h2>
 
             <p>
               The default reasoning scaffold is <code>&lt;think&gt;</code>: a long private monologue, often tens of thousands of tokens, before the answer. Every frontier lab ships a thinking model. The format has become invisible the way <em>"let's think step by step"</em> became invisible a few years before it.
@@ -651,16 +651,16 @@
 
             <div class="callout">
               <span class="callout-label">The question</span>
-              <p>Does the panel scaffold actually reason differently from <code>&lt;think&gt;</code>, or is the difference cosmetic?</p>
+              <p>The panel scaffold must reason differently from <code>&lt;think&gt;</code>, not only format its traces differently. The tests below measure that difference.</p>
             </div>
 
             <p>
               Two benchmarks, paired significance tests, and a mechanical check on pass@k say it reasons differently. Each panel sample covers more of the solution surface than each thinking sample. Successive panel samples add more marginal coverage than successive thinking samples. Same coin, two sides: search that's wider per sample and compounds over k. The cost is single-shot accuracy. Every property that depends on sampling more than once moves the other way.
             </p>
 
-            <h2 id="setup">Setup — one backbone, two scaffolds</h2>
+            <h2 id="setup">Setup: one backbone, two scaffolds</h2>
 
-            <p>The result depends on a matched comparison, so the setup deserves more attention than the headline.</p>
+            <p>The setup controls the comparison: same backbone, same evals, two reasoning formats.</p>
 
             <h3>The backbone</h3>
             <p>
@@ -687,7 +687,7 @@
             </p>
 
             <div class="callout">
-              <span class="callout-label">What makes this comparison fair</span>
+              <span class="callout-label">Matched axes</span>
               <p>Same backbone, same parameter count, same temperature (1.0), same benchmarks, same n, same grader. Two axes vary: the reasoning format each model was post-trained to emit, and the amount of post-training behind it.</p>
             </div>
 
@@ -717,14 +717,14 @@
             <h2 id="method">Measuring "different reasoning"</h2>
 
             <p>
-              Diversity is one of those words that means too many things to be useful without an operational definition. The one I used: draw N completions from each model on the same problem at temperature 1.0, group them per problem and per model, and look at where they sit in semantic space relative to each other. A scaffold that explores more of the solution surface per sample should produce traces that sit further apart.
+              I defined diversity as per-problem semantic spread. Draw N completions from each model on the same problem at temperature 1.0, group them per problem and per model, and measure where they sit in semantic space relative to each other. A scaffold that explores more of the solution surface per sample should produce traces that sit further apart.
             </p>
 
             <div class="mode-grid">
               <div class="mode-card">
                 <span class="tag">01 · extract</span>
                 <span class="t">Isolate the reasoning</span>
-                <span class="desc">Strip the final answer. Keep the contents of <code>&lt;mutipersonaDebate&gt;</code> (panel) or <code>&lt;think&gt;</code> (thinking). Tag-extraction hit rate: 200/200 on both variants — no fallback artifacts.</span>
+                <span class="desc">Strip the final answer. Keep the contents of <code>&lt;mutipersonaDebate&gt;</code> (panel) or <code>&lt;think&gt;</code> (thinking). Tag-extraction hit rate: 200/200 on both variants, with no fallback artifacts.</span>
               </div>
               <div class="mode-card">
                 <span class="tag">02 · embed</span>
@@ -739,16 +739,16 @@
               <div class="mode-card">
                 <span class="tag">04 · sanity</span>
                 <span class="t">Discrete-mode check</span>
-                <span class="desc">DBSCAN on the embeddings (eps=0.25, cosine). If spread goes up but cluster count is flat, the lift is continuous-variance — same one strategy explored from more angles.</span>
+                <span class="desc">DBSCAN on the embeddings (eps=0.25, cosine). If spread goes up but cluster count is flat, the lift is continuous-variance: one strategy explored from more angles.</span>
               </div>
             </div>
 
             <p>The pipeline ran on two benchmarks, paired problem-for-problem. Every comparison below is same-problem, same-n.</p>
 
-            <h2 id="result">The headline — wider search per sample</h2>
+            <h2 id="result">Wider search per sample</h2>
 
             <p>
-              Mean pairwise cosine distance across the N traces a model produces on one problem is a direct proxy for per-sample search volume: how much of the solution surface a single independent sample touches before committing. Higher distance, wider search. Panel's per-sample volume is larger than thinking's on both benchmarks, with nearly identical relative effect sizes.
+              Mean pairwise cosine distance across the N traces a model produces on one problem proxies per-sample search volume: how much of the solution surface a single independent sample touches before committing. Higher distance means wider search. Panel's per-sample volume is larger than thinking's on both benchmarks, with matching relative effect sizes.
             </p>
 
             <div class="stat-row">
@@ -812,12 +812,12 @@
             </div>
 
             <p>
-              The two benchmarks sample different difficulty regimes. MATH500 is near-saturated for thinking (pass@3 = 1.000 on the stratified slice). AIME is not; thinking solves 73% per sample. If the diversity effect were an artifact of both models converging on the same easy answers, the result would shrink on the harder benchmark. It doesn't; the relative effect size is essentially identical.
+              The two benchmarks sample different difficulty regimes. MATH500 is near-saturated for thinking (pass@3 = 1.000 on the stratified slice). AIME is harder; thinking solves 73% per sample. If both models were converging on the same easy answers, the diversity lift would shrink on AIME. It stays at the same scale.
             </p>
 
-            <h3>The lift is not from verbosity</h3>
+            <h3>Token length fails to explain the lift</h3>
             <p>
-              Panel's traces are roughly 1,400 characters on AIME against thinking's 11,300. Thinking writes about 8× as much text per sample. Panel achieves its diversity lift in one-eighth the token budget. Per character, the spread is about 6× wider. The scaffold is not more diverse because it is longer; it is more divergent at every length.
+              Panel's traces are roughly 1,400 characters on AIME against thinking's 11,300. Thinking writes about 8× as much text per sample. Panel achieves its diversity lift in one-eighth the token budget. Per character, the spread is about 6× wider. The scaffold is more divergent at every length.
             </p>
 
             <div class="callout">
@@ -825,10 +825,10 @@
               <p>Cluster count holds at ~1.0 for both models on both benchmarks. The lift is continuous-variance, not discrete-mode. Both scaffolds commit to one strategy per problem; panel orbits that strategy across a wider arc.</p>
             </div>
 
-            <h2 id="passk">The pass@k signature — search that compounds</h2>
+            <h2 id="passk">The pass@k signature</h2>
 
             <p>
-              An mpnet result on its own is fair to doubt. The next step was to look for a mechanical consequence with no embeddings inside it. If panel really covers more solution surface per sample, each additional panel sample should add more marginal coverage than each additional thinking sample. The two pass@k curves should converge as k grows.
+              An mpnet result on its own is fair to doubt. I looked for a mechanical consequence with no embeddings inside it. If panel covers more solution surface per sample, each additional panel sample should add more marginal coverage than each additional thinking sample. The two pass@k curves should converge as k grows.
             </p>
 
             <figure class="chart">
@@ -841,7 +841,7 @@
                 </text>
                 <text x="480" y="54" text-anchor="middle" fill="#969592"
                       font-family="Inter, Helvetica Neue, sans-serif" font-size="12" font-weight="400">
-                  Panel trails at every k but the gap narrows monotonically — +15.6 pp closure from k=1 to k=16.
+                  Panel trails at every k, but the gap narrows monotonically: +15.6 pp closure from k=1 to k=16.
                 </text>
 
                 <line x1="370" y1="78" x2="402" y2="78" stroke="#3B3B39" stroke-width="2" />
@@ -899,16 +899,16 @@
                 </text>
               </svg>
               <figcaption>
-                <strong>Figure 1.</strong> Matched pass@k on AIME 2024+25, both models sampled at n=16 across 20 problems. Unbiased Codex-paper estimator: pass@k = 1 − C(n−c, k) / C(n, k). Panel never crosses thinking in the measured range, but the gap narrows monotonically with k — the signature the diversity hypothesis predicts.
+                <strong>Figure 1.</strong> Matched pass@k on AIME 2024+25, both models sampled at n=16 across 20 problems. Unbiased Codex-paper estimator: pass@k = 1 − C(n−c, k) / C(n, k). Panel never crosses thinking in the measured range, but the gap narrows monotonically with k, matching the diversity hypothesis.
               </figcaption>
             </figure>
 
             <p>
-              The signature replicates on three independent slices, not just AIME.
+              The signature replicates on three independent slices, including AIME.
             </p>
 
             <div class="table-wrap">
-              <div class="table-label"><span class="id">Table 02</span>Gap closure across slices — the diversity signature replicates</div>
+              <div class="table-label"><span class="id">Table 02</span>Gap closure across slices, the diversity signature replicates</div>
               <table>
                 <thead>
                   <tr>
@@ -949,13 +949,13 @@
               Three slices, three positive closures, all monotone in k. The pass@k mechanism agrees with the embedding measurement, and it does so without knowing anything about embeddings.
             </p>
 
-            <h2 id="cost">Token efficiency — the deployment lens</h2>
+            <h2 id="cost">Token efficiency for deployment</h2>
 
             <p>
-              The pass@k story says: <em>at fixed sample count, panel closes the gap with k.</em> A reader who actually deploys a model cares about a different question: <em>at fixed correctness, who is cheaper?</em> Cosine distances and pass@k curves are mechanism-level results. Tokens-per-correct-answer is what shows up on a bill.
+              The pass@k story says: <em>at fixed sample count, panel closes the gap with k.</em> Deployment adds a cost question: <em>at fixed correctness, which scaffold uses fewer tokens?</em> Cosine distances and pass@k curves are mechanism-level results. Tokens-per-correct-answer shows up on the bill.
             </p>
             <p>
-              I re-joined the existing eval rollouts pairwise on (problem, sample-index) — same prompts, same temperature, same max-token budgets — and looked at the <code>completion_tokens</code> field that sampling already wrote out. No re-tokenization, no embeddings, no judgment calls. The comparison is paired by construction. For the visceral version of the same finding, the <a href="../case_study/gallery.html">20-problem side-by-side gallery</a> renders one panel and one thinking sample on each problem in adjacent columns.
+              I re-joined the existing eval rollouts pairwise on (problem, sample-index), using the same prompts, same temperature, and same max-token budgets, then read the <code>completion_tokens</code> field that sampling wrote out. No re-tokenization, no embeddings, no judgment calls. The comparison is paired by construction. For the same finding in concrete form, the <a href="../case_study/gallery.html">20-problem side-by-side gallery</a> renders one panel and one thinking sample on each problem in adjacent columns.
             </p>
 
             <div class="stat-row">
@@ -996,7 +996,7 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <td>MATH500 L5 — both correct</td>
+                    <td>MATH500 L5, both correct</td>
                     <td class="num">306</td>
                     <td class="num">652</td>
                     <td class="num">4,958</td>
@@ -1004,7 +1004,7 @@
                     <td class="num">306 / 306</td>
                   </tr>
                   <tr>
-                    <td>MATH500 L5 — panel-only correct</td>
+                    <td>MATH500 L5, panel-only correct</td>
                     <td class="num">12</td>
                     <td class="num">825</td>
                     <td class="num">10,013</td>
@@ -1012,7 +1012,7 @@
                     <td class="num">12 / 12</td>
                   </tr>
                   <tr>
-                    <td>MATH500 L5 — all paired</td>
+                    <td>MATH500 L5, all paired</td>
                     <td class="num">536</td>
                     <td class="num">786</td>
                     <td class="num">6,634</td>
@@ -1020,7 +1020,7 @@
                     <td class="num">534 / 536</td>
                   </tr>
                   <tr class="highlight">
-                    <td>AIME 24+25 — both correct</td>
+                    <td>AIME 24+25, both correct</td>
                     <td class="num">68</td>
                     <td class="num">1,034</td>
                     <td class="num">5,510</td>
@@ -1028,7 +1028,7 @@
                     <td class="num">67 / 68</td>
                   </tr>
                   <tr>
-                    <td>AIME 24+25 — panel-only correct</td>
+                    <td>AIME 24+25, panel-only correct</td>
                     <td class="num">4</td>
                     <td class="num">1,116</td>
                     <td class="num">16,384</td>
@@ -1036,7 +1036,7 @@
                     <td class="num">4 / 4</td>
                   </tr>
                   <tr>
-                    <td>AIME 24+25 — all paired</td>
+                    <td>AIME 24+25, all paired</td>
                     <td class="num">320</td>
                     <td class="num">1,069</td>
                     <td class="num">11,977</td>
@@ -1088,8 +1088,8 @@
             </p>
 
             <div class="callout">
-              <span class="callout-label">Caveat — max-token cap</span>
-              <p>Thinking sampled at <code>max_tokens=16384</code>. Some thinking traces hit the cap mid-trace, which inflates the all-paired ratios. The both-correct subset is the conservative read: there, thinking ran to completion (AIME both-correct median = 5,510 tokens, MATH = 4,958 — both well below 16k), and the median ratios of 5.89× and 6.91× are not a truncation artifact. They sit downstream of the same diversity mechanism: 3 personas commit early on different paths and converge fast; one persona explores with backtracking.</p>
+              <span class="callout-label">Caveat: max-token cap</span>
+              <p>Thinking sampled at <code>max_tokens=16384</code>. Some thinking traces hit the cap mid-trace, which inflates the all-paired ratios. The both-correct subset is the conservative read: there, thinking ran to completion (AIME both-correct median = 5,510 tokens, MATH = 4,958, both well below 16k), and the median ratios of 5.89× and 6.91× come from completed traces rather than truncation. They sit downstream of the same diversity mechanism: three personas commit early on different paths and converge fast; one persona explores with backtracking.</p>
             </div>
 
             <p>
@@ -1098,11 +1098,11 @@
 
             <h2 id="limits">Bounds on the claim</h2>
 
-            <p>A few honest bounds, so the result is not over-claimed on the way out.</p>
+            <p>I keep the claim inside these bounds.</p>
 
             <div class="callout">
-              <span class="callout-label">What the result is not</span>
-              <p>Per-sample accuracy on the panel is lower than on thinking: about 33 pp lower on MATH500 L5, about 51 pp lower on AIME. In the k range I tested, the curves converge but never cross. On AIME, panel solves a strict subset of what thinking solves (11/20 vs 18/20, no panel-only wins). The MATH RL stage also compressed diversity from 0.174 to 0.095; the released checkpoint is an exploration–reliability compromise, not a pure-diversity win. The cost-per-correct comparison flips the per-sample-accuracy picture, but it doesn't make the per-sample-accuracy picture untrue: at fixed sample budget thinking still wins, and that's the right denominator for some applications.</p>
+              <span class="callout-label">Scope limit</span>
+              <p>Per-sample accuracy on the panel is lower than on thinking: about 33 pp lower on MATH500 L5, about 51 pp lower on AIME. In the k range I tested, the curves converge but never cross. On AIME, panel solves a strict subset of what thinking solves (11/20 vs 18/20, no panel-only wins). The MATH RL stage also compressed diversity from 0.174 to 0.095; the released checkpoint is an exploration-reliability compromise, not a pure-diversity win. The cost-per-correct comparison flips the per-sample-accuracy picture, but fixed sample budget still favors thinking, and that is the right denominator for some applications.</p>
             </div>
 
             <p>
@@ -1112,16 +1112,16 @@
             <h2 id="rlvr">From wider search to faster hill-climbing</h2>
 
             <p>
-              The original draft promised a third benchmark as the next step. The follow-up went further than that. Instead of a pass@k re-replication on a new dataset, I asked whether the per-sample diversity converts into gradient signal under RLVR.
+              The original draft promised a third benchmark as the next step. The follow-up went further. Instead of a pass@k replication on a new dataset, I tested whether per-sample diversity converts into gradient signal under RLVR.
             </p>
             <p>
-              Group-relative RLVR (GRPO, RLOO) only produces non-zero advantage when a group of rollouts on the same problem contains both correct and incorrect samples. The <em>variance band</em> — problems with 0 &lt; pass@G &lt; 1 — is therefore the only regime that contributes to the policy gradient. Wider per-sample search predicts a wider variance band: more rollouts that fall outside both ceilings, more problems with usable advantage, more trainable data.
+              Group-relative RLVR (GRPO, RLOO) only produces non-zero advantage when a group of rollouts on the same problem contains both correct and incorrect samples. The <em>variance band</em>, problems with 0 &lt; pass@G &lt; 1, is the only regime that contributes to the policy gradient. Wider per-sample search predicts a wider variance band: more rollouts that fall outside both ceilings, more problems with usable advantage, more trainable data.
             </p>
             <p>
               The pool: 877 olympiad problems from HMMT 2024+25, AIME 2024+25, the OlympiadBench math/English/competition split, and AMC. Each problem was sampled G=8 times per arm at temperature 1.0 and sorted into <code>all_zero</code> (none correct), <code>variance_band</code> (1–7 of 8 correct), or <code>all_one</code> (all 8 correct). Variance band carries gradient. The other two cells are training dead weight under group-relative RLVR.
             </p>
 
-            <h3>Variance-band size — diversity on the gradient axis</h3>
+            <h3>Variance-band size on the gradient axis</h3>
 
             <p>On the same 877 problems, same G, same temperature:</p>
 
@@ -1204,7 +1204,7 @@
             </div>
 
             <p>
-              Only 72 problems sit in both bands at once: 19% of panel's, 34% of thinking's. The largest off-diagonal cell on panel's row is the 280 problems where panel still has signal but thinking is saturated. The largest cell on thinking's column is the 137 problems where thinking has signal but panel is below the noise floor. The two scaffolds are working in different parts of problem-space, and panel's part is wider. A joint training pool would have discarded exactly the cells the diversity claim predicted.
+              Only 72 problems sit in both bands at once: 19% of panel's, 34% of thinking's. The largest off-diagonal cell on panel's row is the 280 problems where panel still has signal but thinking is saturated. The largest cell on thinking's column is the 137 problems where thinking has signal but panel is below the noise floor. The two scaffolds work in different parts of problem-space, and panel's part is wider. A joint training pool would have discarded the cells the diversity claim predicted.
             </p>
 
             <p>
@@ -1289,11 +1289,11 @@
                 </text>
               </svg>
               <figcaption>
-                <strong>Figure 2.</strong> Panel held-out pass@1 across 100 RL steps on the panel variance band (354 training problems). Trajectory shape: brief weight-shock dip at batch 10 → monotone climb to batch 50 → step-jump at batch 70 → plateau at 27–29%. Vanilla Qwen3-thinking sits at <strong>~60% on the same held-out</strong> (off-chart); panel ends at roughly half of thinking's pre-RL pass rate, but more than doubles its own starting point.
+                <strong>Figure 2.</strong> Panel held-out pass@1 across 100 RL steps on the panel variance band (354 training problems). Trajectory shape: brief weight-shock dip at batch 10, monotone climb to batch 50, step-jump at batch 70, plateau at 27-29%. Vanilla Qwen3-thinking sits at <strong>~60% on the same held-out</strong> (off-chart); panel ends at about half of thinking's pre-RL pass rate, but more than doubles its own starting point.
               </figcaption>
             </figure>
 
-            <h3>The mechanism — gains scale with training-pool representation</h3>
+            <h3>Gains scale with training-pool representation</h3>
 
             <p>
               Panel's training pool is unevenly distributed across sources because each source contributes a different fraction of problems to panel's variance band. The held-out gains track that distribution closely:
@@ -1352,13 +1352,13 @@
             </div>
 
             <p>
-              Two readings of the table. First: the absolute gain is largest where the training pool is densest (OlympiadBench, +24 pp on 88% of train). Second: every source moved, including HMMT, which had effectively no direct training data. The pattern is transfer, not memorization. The 4 pp HMMT lift is one problem out of 25, so the absolute number is at the noise floor on its own. The monotone ordering across sources is not.
+              Two readings matter. First: the absolute gain is largest where the training pool is densest (OlympiadBench, +24 pp on 88% of train). Second: every source moved, including HMMT, which had almost no direct training data. The pattern is transfer, not memorization. The 4 pp HMMT lift is one problem out of 25, so the absolute number sits at the noise floor on its own. The monotone ordering across sources carries the stronger evidence.
             </p>
 
-            <h3>Diversity through RL — entropy collapses, length-spread doesn't</h3>
+            <h3>Diversity through RL</h3>
 
             <p>
-              RL is a known diversity-killer. The natural worry was that 100 steps of RLVR would collapse the policy distribution and quietly erase the property the scaffold was chosen for. I tracked two diversity proxies across the run: per-token policy entropy, and trajectory-length spread within a group of 16 rollouts on the same problem.
+              RL often kills diversity. I wanted to know whether 100 steps of RLVR would collapse the policy distribution and erase the property that made the scaffold useful. I tracked two diversity proxies across the run: per-token policy entropy and trajectory-length spread within a group of 16 rollouts on the same problem.
             </p>
 
             <div class="stat-row">
@@ -1385,25 +1385,25 @@
             </div>
 
             <p>
-              Entropy goes the way the textbook predicts. Length spread does not. Panel becomes more confident per token while producing increasingly varied trajectory lengths on the same problem. The signature reads as the three personas keeping their distinct verbosities even as each persona's per-token distribution sharpens.
+              Entropy follows the textbook prediction. Length spread moves the other way. Panel becomes more confident per token while producing more varied trajectory lengths on the same problem. The signature reads as the three personas keeping their distinct verbosities even as each persona's per-token distribution sharpens.
             </p>
 
             <p>
-              Length CV is a cheap proxy, not a semantic one. The full mpnet-cosine measurement on a post-RL checkpoint, the same pipeline that produced the +78% / +76% numbers above, is not in this run. It is in the open list at the bottom of the post. The directional read here is consistent with the diversity story; the strong claim waits for the strong measurement.
+              Length CV is a cheap proxy, not a semantic one. I did not run the full mpnet-cosine measurement on a post-RL checkpoint, the same pipeline that produced the +78% / +76% numbers above. That measurement is in the open list at the bottom of the post. The directional read here fits the diversity story; the strong claim waits for the strong measurement.
             </p>
 
-            <h3>What this section does and doesn't say</h3>
+            <h3>RLVR scope</h3>
 
             <div class="neg-list">
               <span class="neg-list-label">Honest scope</span>
               <ul>
-                <li><strong>Does say:</strong> the variance-band advantage the diversity claim predicts is real (382 vs 209 on the 877-problem pool). It converts to RL gradient signal: 100 steps double panel's olympiad held-out pass rate (14% → 29%), with per-source gains scaling with training-pool representation. The diversity reservoir survives the run on the proxy I measured — per-token entropy collapses, but length spread within a group grows.</li>
-                <li><strong>Does not say:</strong> the matched <code>&lt;think&gt;</code> RL comparison ran to completion. At ~17× the per-rollout token cost, the matched 100-step thinking run would have taken about 37 hours of Tinker compute, and I hit the billing wall first. The static reference is vanilla Qwen3-thinking on the shared held-out: ~60% pass@1 aggregate, ~55% on OlympiadBench, ~75% on AMC, all at G=8. Panel ends at 29%, about half. The result here is about rate of climb under matched hyperparameters, not absolute capability.</li>
+                <li><strong>Claim:</strong> the variance-band advantage the diversity claim predicts is real (382 vs 209 on the 877-problem pool). It converts to RL gradient signal: 100 steps double panel's olympiad held-out pass rate (14% → 29%), with per-source gains scaling with training-pool representation. The diversity reservoir survives the run on the proxy I measured: per-token entropy collapses, but length spread within a group grows.</li>
+                <li><strong>Limit:</strong> I did not finish the matched <code>&lt;think&gt;</code> RL comparison. At ~17× the per-rollout token cost, the matched 100-step thinking run would have taken about 37 hours of Tinker compute, and I hit the billing wall first. The static reference is vanilla Qwen3-thinking on the shared held-out: ~60% pass@1 aggregate, ~55% on OlympiadBench, ~75% on AMC, all at G=8. Panel ends at 29%, about half. The result here is about rate of climb under matched hyperparameters, not absolute capability.</li>
                 <li><strong>Single seed, single run:</strong> the +15 pp number is one seed. The curve's shape replicates across the per-source breakdown; the absolute number wants a second seed before its CI gets reported.</li>
               </ul>
             </div>
 
-            <h2 id="next">What's next</h2>
+            <h2 id="next">Next work</h2>
 
             <p>
               The Apr 25 update closes the cross-benchmark item from the original list. Variance-band classifications now exist on HMMT, AIME, OlympiadBench, and AMC, with held-out evaluation across all four sources. The remaining items, ordered by how much each would sharpen the claim:
@@ -1426,16 +1426,16 @@
 
             <h3>Scaling study on n</h3>
             <p>
-              Does the gap-closure curve keep tightening past the sample budgets I tried? Pushing panel to n=64 or n=128 on the L5 slice gives the asymptote, which decides between "diversity that eventually catches up" and "diversity that plateaus below thinking." Current data points to the latter. The slope at n=16 is not zero.
+              Pushing panel to n=64 or n=128 on the L5 slice gives the asymptote, which decides between "diversity that catches up" and "diversity that plateaus below thinking." Current data points to the latter. The slope at n=16 remains positive.
             </p>
 
             <div class="break">· · ·</div>
 
             <p>
-              The headline holds with the addition. A LoRA rank-32 adapter, a few hundred gradient steps, four to five orders of magnitude under the baseline's post-training compute. The scaffold widens per-sample search by 76–78% on two benchmarks. The widening compounds over k on three independent slices. On a fresh olympiad pool it puts 1.83× more problems in the gradient-signal-bearing band than the production thinking model. 100 RL steps on that band double the held-out pass rate. The mechanism that helped at inference time — more coverage per sample — helps at training time too, because group-relative RLVR only sees variance-band problems, and panel has more of them.
+              The headline holds with the addition. A LoRA rank-32 adapter and a few hundred gradient steps, four to five orders of magnitude under the baseline's post-training compute, widen per-sample search by 76-78% on two benchmarks. The widening compounds over k on three independent slices. On a fresh olympiad pool it puts 1.83× more problems in the gradient-signal-bearing band than the production thinking model. 100 RL steps on that band double the held-out pass rate. The mechanism that helped at inference time, more coverage per sample, helps at training time too, because group-relative RLVR only sees variance-band problems, and panel has more of them.
             </p>
             <p>
-              Scaffold choice is a lever, and it costs nothing at inference. The remaining questions narrow to three: matched <code>&lt;think&gt;</code> RL versus panel RL under the same recipe, semantic diversity on a post-RL checkpoint, and the asymptote at larger n. The further-out question — what a full post-training pipeline could do with a panel scaffold instead of against one — sits past the next set of experiments. The new data moves it closer.
+              Scaffold choice is a lever, and it costs nothing at inference. The remaining questions narrow to three: matched <code>&lt;think&gt;</code> RL versus panel RL under the same recipe, semantic diversity on a post-RL checkpoint, and the asymptote at larger n. A later experiment can ask what a full post-training pipeline could do with a panel scaffold instead of against one.
             </p>
 
           </div>

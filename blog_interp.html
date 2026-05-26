@@ -569,35 +569,35 @@
             <div class="tldr">
               <span class="tldr-label">TL;DR</span>
               <p>
-                Llama 3.1 8B's structured self-report does not reliably reveal which claims in a long-form answer are unreliable. On MAUD merger-agreement QA under a GPT-5.4 judge, self-report reaches <strong>0.511 AUROC</strong>; a logistic regression on layer-19 residual activations reaches <strong>0.771</strong>, paired delta <strong>+0.260 [0.137, 0.387]</strong>. On FActScore biographies under human atomic-fact labels, self-report reaches <strong>0.541</strong> and the residual probe reaches <strong>0.802</strong>, paired delta <strong>+0.262 [0.219, 0.302]</strong>.
+                Llama 3.1 8B's structured self-report misses unreliable claims in long-form answers. On MAUD merger-agreement QA under a GPT-5.4 judge, self-report reaches <strong>0.511 AUROC</strong>; a logistic regression on layer-19 residual activations reaches <strong>0.771</strong>, paired delta <strong>+0.260 [0.137, 0.387]</strong>. On FActScore biographies under human atomic-fact labels, self-report reaches <strong>0.541</strong> and the residual probe reaches <strong>0.802</strong>, paired delta <strong>+0.262 [0.219, 0.302]</strong>.
               </p>
               <p>
-                The result is not "the model knows truth." It is more specific. Hidden activations carry a recoverable claim-level correctness signal that the model's verbal confidence does not surface, and the effect size is nearly identical across two settings that differ in label source, generation source, and content domain. The boundary matters too. FELM points the same way but is statistically inconclusive, and its matched-generation repair shows that reference-bounded labels can collapse into evidence-coverage measurements once generated claims exceed the reference scope.
+                The narrow claim: hidden activations carry recoverable claim-level correctness signal that the model's verbal confidence does not surface. The effect size matches across two settings with different label sources, generation sources, and content domains. FELM points the same way but remains statistically inconclusive; its matched-generation repair shows reference-bounded labels collapsing into evidence-coverage measurements once generated claims exceed the reference scope.
               </p>
             </div>
 
-            <h2 id="question">When self-report is not enough</h2>
+            <h2 id="question">Self-report misses local failure</h2>
 
             <p>
-              Long answers fail locally. One sentence is right, the next is partly right, the next is confidently wrong. A user who depends on the answer needs to know which is which. A single answer-level confidence number is not enough.
+              Long answers fail claim by claim. One sentence is right, the next is partly right, the next is confidently wrong. A user who depends on the answer needs to know which is which. A single answer-level confidence number cannot do that job.
             </p>
             <p>
-              The simplest claim-level baseline is to ask the model. Show Llama 3.1 8B a fixed claim from its own answer and ask for structured confidence. If self-report ranks correct claims above incorrect ones, a probe-based system is wasted complexity. If it does not, the alternative has to come from somewhere else inside the same forward pass.
+              The simplest claim-level baseline is to ask the model. Show Llama 3.1 8B a fixed claim from its own answer and ask for structured confidence. If self-report ranks correct claims above incorrect ones, a probe-based system is wasted complexity. When self-report fails, the alternative has to come from somewhere else inside the same forward pass.
             </p>
 
             <div class="callout">
               <span class="callout-label">The question</span>
-              <p>Does Llama's structured self-report rank claim correctness? And if not, does a linear readout of its hidden activations on the same claims recover that signal? In the settings studied here the answers are no and yes, and the gap is large.</p>
+              <p>Llama's structured self-report fails to rank claim correctness in these runs. A linear readout of its hidden activations on the same claims recovers that signal, with a large gap.</p>
             </div>
 
             <p>
-              The probe is deliberately simple: layer-19 residual-stream vectors pooled over the claim span, standardized, fed to L2 logistic regression. No attention head selection, no SAE feature search, no learned pooling. The point is to test whether the basic geometric assumption holds before reaching for anything more expressive.
+              The probe stays simple: layer-19 residual-stream vectors pooled over the claim span, standardized, fed to L2 logistic regression. No attention head selection, no SAE feature search, no learned pooling. I wanted to test the basic geometric assumption before reaching for anything more expressive.
             </p>
 
-            <h2 id="setup">Setup &mdash; one probed model, three label regimes</h2>
+            <h2 id="setup">Setup: one probed model, three label regimes</h2>
 
             <p>
-              The probed model is always Llama 3.1 8B Instruct. What changes is the dataset and label source. MAUD provides 150 fixed legal claims scored by two LLM judges. FActScore provides 4,886 human-labeled atomic facts mapped to parent biography sentences. FELM provides human segment labels on world-knowledge QA, where the matched-generation repair eventually exposed an annotation-target problem.
+              The probed model is Llama 3.1 8B Instruct throughout. The dataset and label source change. MAUD provides 150 fixed legal claims scored by two LLM judges. FActScore provides 4,886 human-labeled atomic facts mapped to parent biography sentences. FELM provides human segment labels on world-knowledge QA, where the matched-generation repair exposed an annotation-target problem.
             </p>
 
             <div class="mode-grid">
@@ -614,7 +614,7 @@
               <div class="mode-card">
                 <span class="tag">03 &middot; FELM-wk</span>
                 <span class="t">Boundary case</span>
-                <span class="desc">Human-annotated world-knowledge segments. Probes are directionally above self-report but the paired delta crosses zero, and the matched-generation repair returns 30 of 52 segments as <code>not_enough_evidence</code>.</span>
+                <span class="desc">Human-annotated world-knowledge segments. Probes beat self-report in the point estimate, but the paired delta crosses zero, and the matched-generation repair returns 30 of 52 segments as <code>not_enough_evidence</code>.</span>
               </div>
               <div class="mode-card">
                 <span class="tag">04 &middot; Baseline</span>
@@ -624,10 +624,10 @@
             </div>
 
             <p>
-              The two protocols differ because the sample sizes do. MAUD's 150 claims do not support a clean train/validation/test split, so the headline MAUD probe uses leave-one-out evaluation over the frozen full set. FActScore's 4,886 facts comfortably support a 70/15/15 split by biography, with 3,353 train, 791 validation, and 742 test claims. Both choices are conventional for their respective regimes; the comparison the article makes is over the qualitative gap, not over identical pipelines.
+              The two protocols differ because the sample sizes differ. MAUD's 150 claims do not support a clean train/validation/test split, so the headline MAUD probe uses leave-one-out evaluation over the frozen full set. FActScore's 4,886 facts support a 70/15/15 split by biography, with 3,353 train, 791 validation, and 742 test claims. I compare the qualitative gap, not identical pipelines.
             </p>
 
-            <h2 id="headline">The headline &mdash; same gap, two domains</h2>
+            <h2 id="headline">Same gap, two domains</h2>
 
             <p>
               The simplest evaluation is whether each score ranks correct claims above non-correct claims. AUROC is 0.5 at chance. Higher is better. Brier score on the same scores measures how well the probability magnitudes match the binary label.
@@ -647,7 +647,7 @@
               <div class="stat">
                 <span class="k">FELM &Delta;AUROC</span>
                 <div class="v">+0.141</div>
-                <div class="s">[-0.063, 0.320] &mdash; interval crosses zero</div>
+                <div class="s">[-0.063, 0.320]; interval crosses zero</div>
               </div>
               <div class="stat">
                 <span class="k">Self-report ceiling</span>
@@ -744,7 +744,7 @@
                 </text>
               </svg>
               <figcaption>
-                <strong>Figure 1.</strong> Residual activations carry substantially more claim-level correctness signal than Llama self-report on MAUD and FActScore. The two paired AUROC deltas are within 0.002 of each other despite the protocols differing in label source, generation source, and content domain. FELM is directionally consistent but treated as a boundary case.
+                <strong>Figure 1.</strong> Residual activations carry more claim-level correctness signal than Llama self-report on MAUD and FActScore. The two paired AUROC deltas are within 0.002 of each other despite the protocols differing in label source, generation source, and content domain. I treat FELM as a boundary case because its interval crosses zero.
               </figcaption>
             </figure>
 
@@ -786,12 +786,12 @@
               </table>
             </div>
 
-            <h3>Why this is a replication, not a copy</h3>
+            <h3>Replication scope</h3>
             <p>
-              MAUD uses leave-one-out over a small judge-labeled legal claim set. FActScore uses a 70/15/15 split by biography over a much larger human-labeled biography set. The protocols are not identical, and they should not be: 150 rows do not support what 4,886 do. What replicates is the qualitative gap between self-report and residual activations, with paired effect sizes of +0.260 and +0.262 AUROC. Treat the agreement as evidence about the signal, not the pipeline.
+              MAUD uses leave-one-out over a small judge-labeled legal claim set. FActScore uses a 70/15/15 split by biography over a much larger human-labeled biography set. I do not force 150 rows to imitate 4,886. The replicated object is the qualitative gap between self-report and residual activations, with paired effect sizes of +0.260 and +0.262 AUROC. Treat the agreement as evidence about the signal rather than the pipeline.
             </p>
 
-            <h2 id="judges">Second judge &mdash; does the ordering survive?</h2>
+            <h2 id="judges">Second judge sensitivity</h2>
 
             <p>
               MAUD's first labels come from a GPT-5.4 judge-proxy protocol. Probes trained on those labels could be fitting whatever GPT-5.4 happens to score consistently rather than something more general. The cleanest test is to relabel the same fixed claims with a different judge family and rescore the same probes without retraining. I use Kimi K2.6 through Prime Intellect Inference, with the prompt structure and claim serialization preserved.
@@ -921,9 +921,9 @@
               </table>
             </div>
 
-            <h3>Where the judges actually disagree</h3>
+            <h3>Judge disagreement</h3>
             <p>
-              The two judges agree on 110 of 150 claims. Cohen's kappa is 0.572 [0.456, 0.682]. The disagreement is not uniform across the rubric. Stratifying by GPT-5.4's label shows where the boundary is hardest.
+              The two judges agree on 110 of 150 claims. Cohen's kappa is 0.572 [0.456, 0.682]. Disagreement clusters around the rubric boundary. Stratifying by GPT-5.4's label shows the hard cases.
             </p>
 
             <div class="table-wrap">
@@ -972,15 +972,15 @@
             </div>
 
             <p>
-              The judges agree most on clearly true claims, less on clearly false claims, and least on partially-true claims. That is exactly where the rubric boundary should be hardest, and it is the regime that drives the kappa down toward 0.57. The 110-claim agreement subset is therefore not just a robustness slice; it is the most interpretable subset MAUD has, because it strips out labels where two different judges meaningfully disagree.
+              The judges agree most on true claims, less on false claims, and least on partially-true claims. That boundary drives kappa down toward 0.57. The 110-claim agreement subset gives the cleanest MAUD slice because it removes labels where two judge families disagree.
             </p>
 
             <div class="callout">
               <span class="callout-label">Sanity check</span>
-              <p>On the 110-claim agreement set, every strong method gets cleaner: GPT-5.4 scoring rises to 0.981, the residual probe rises to 0.793, the SAE probe rises to 0.712. If a probe were primarily fitting GPT-5.4's quirks, restricting evaluation to claims another judge family also accepts should not help. The improvement is consistent with probes tracking signal that survives judge disagreement.</p>
+              <p>On the 110-claim agreement set, every strong method gets cleaner: GPT-5.4 scoring rises to 0.981, the residual probe rises to 0.793, the SAE probe rises to 0.712. A probe fitting GPT-5.4's quirks should not improve when evaluation keeps only claims another judge family accepts. The improvement fits the interpretation that probes track signal surviving judge disagreement.</p>
             </div>
 
-            <h2 id="diagnostics">FActScore probe diagnostics &mdash; not a fragile fit</h2>
+            <h2 id="diagnostics">FActScore probe diagnostics</h2>
 
             <p>
               FActScore changes everything except the probed model: human atomic-fact labels instead of LLM judges, ChatGPT generations instead of Llama generations, biography factuality instead of merger-agreement QA, atomic facts pooled to parent sentence spans instead of extracted legal claims. Despite all of that, the residual probe's held-out AUROC lands at 0.802. The diagnostic question is whether that test number reflects a real generalization or a happy validation set.
@@ -1060,14 +1060,14 @@
               The Brier scores tell the same story without the rank-only filter. Self-report Brier is 0.298, which means the probabilities Llama emits are barely better than always saying 0.5; the residual probe Brier is 0.171, reaching well past calibration parity. AUROC and Brier disagreeing would be a flag for rank-vs-magnitude trade-off; here they agree, and the probe wins on both.
             </p>
 
-            <h2 id="boundary">The boundary &mdash; when labels measure coverage</h2>
+            <h2 id="boundary">The boundary: labels can measure coverage</h2>
 
             <p>
-              FELM-wk is the third dataset, and it is the cleanest case for the cautionary half of the article. The minimum-viable run reaches 0.652 residual probe AUROC against 0.511 for self-report, with paired delta +0.141 [-0.063, 0.320]. Direction is positive. The interval crosses zero. That is what "directionally consistent but inconclusive" looks like in numbers.
+              FELM-wk gives the cautionary case. The minimum-viable run reaches 0.652 residual probe AUROC against 0.511 for self-report, with paired delta +0.141 [-0.063, 0.320]. The point estimate is positive. The interval crosses zero.
             </p>
 
             <p>
-              The interesting finding in FELM is not the held-out AUROC. It is what happened when I tried to repair the annotation. Llama-generated FELM-style answers go beyond FELM's curated reference snippets often enough that calling them <code>false</code> against those snippets is the wrong target. I added fuller readability-extracted references and a fourth <code>not_enough_evidence</code> label. The repaired pilot's 52 segments came back like this:
+              The useful FELM finding came from the annotation repair. Llama-generated FELM-style answers exceed FELM's curated reference snippets often enough that scoring them <code>false</code> against those snippets targets the wrong object. I added fuller readability-extracted references and a fourth <code>not_enough_evidence</code> label. The repaired pilot's 52 segments came back like this:
             </p>
 
             <div class="stat-row">
@@ -1089,22 +1089,22 @@
               <div class="stat">
                 <span class="k">not_enough_evidence</span>
                 <div class="v">30</div>
-                <div class="s">57.7% &mdash; reference scope is the bottleneck</div>
+                <div class="s">57.7%; reference scope is the bottleneck</div>
               </div>
             </div>
 
             <p>
-              <code>not_enough_evidence</code> at 57.7% is not noise. It is a structural finding: when generated claims exceed the reference scope, a reference-bounded annotator cannot adjudicate them. The label tells me whether the bundle supports the claim, not whether the claim is true. That is a coverage measurement, not a correctness measurement, and it is the wrong target for a probe trained on claim correctness. I therefore did not scale the matched-generation FELM run; instead, FELM stays in the paper as a documented boundary that explains why label provenance matters more than domain similarity.
+              A 57.7% <code>not_enough_evidence</code> rate exposes the target mismatch. Generated claims can exceed the reference scope; then a reference-bounded annotator cannot adjudicate them. The label tells me whether the bundle supports the claim, not whether the claim is true. That gives a coverage measurement, not a correctness measurement, and it is the wrong target for a probe trained on claim correctness. I did not scale the matched-generation FELM run; FELM stays in the paper as a documented boundary for label provenance.
             </p>
 
             <h2 id="lesson">The methodological lesson</h2>
 
             <p>
-              The strongest lesson is not "legal QA transfers to biography QA." It is that label provenance dominates. MAUD works because fixed claims are judged by a clear rubric. FActScore works because human atomic-fact labels directly capture factual support. FELM is weaker because segment labels and reference coverage are coarser than the claim-level correctness target the probe needs. Claim construction and label provenance affect probe trainability as much as the probe architecture does.
+              Label provenance dominates the transfer story. MAUD works because fixed claims are judged by a clear rubric. FActScore works because human atomic-fact labels capture factual support. FELM is weaker because segment labels and reference coverage are coarser than the claim-level correctness target the probe needs. Claim construction and label provenance affect probe trainability as much as the probe architecture does.
             </p>
 
             <p>
-              For a probe-based uncertainty system, the hard questions come before the classifier ever runs. What is the claim? What does the label actually capture? Does the activation span match the label unit? When those three line up, a regularized linear readout of the residual stream recovers a sizeable correctness signal. When they do not, a stronger probe will mostly learn a muddier target.
+              A probe-based uncertainty system starts before the classifier runs. Define the claim. Name what the label captures. Align the activation span with the label unit. With those three pieces aligned, a regularized linear readout of the residual stream recovers a sizeable correctness signal. With a muddier target, a stronger probe mostly learns the mud.
             </p>
 
             <h2 id="bounds">Bounds on the claim</h2>
@@ -1112,16 +1112,16 @@
             <div class="neg-list">
               <span class="neg-list-label">Honest scope</span>
               <ul>
-                <li><strong>Does say:</strong> residual activations recover claim-level correctness signal that structured Llama self-report misses on MAUD and FActScore. The paired AUROC delta lands at +0.260 and +0.262 across the two settings.</li>
-                <li><strong>Does not say:</strong> probes detect legal or factual truth in an absolute sense. MAUD remains judge-proxy evidence until the frozen 30-claim human audit is analyzed.</li>
-                <li><strong>Does say:</strong> the GPT-5.4 external scorer is the strongest MAUD method, but its 0.944 AUROC inflates from same-family scorer-judge coupling. The defensible estimate is 0.872 under the independent judge.</li>
-                <li><strong>Does not say:</strong> residual probes reliably beat SAE probes. Residual is directionally stronger, but residual-minus-SAE intervals cross zero under judge 2 and on the agreement set.</li>
-                <li><strong>Does not say:</strong> the residual correctness direction decomposes into a small number of Goodfire layer-19 SAE features. A separate analysis (<a href="probe_interpretation.md">probe_interpretation.md</a>) found the signal distributed; the probe is a useful behavioral readout, not a compact mechanism story.</li>
-                <li><strong>Does not say:</strong> the result generalizes to other model families, other layers, or other claim extractors. All probes are layer 19 of Llama 3.1 8B Instruct. CUAD failed at the claim-extraction step before this protocol could run.</li>
+                <li><strong>Claim:</strong> residual activations recover claim-level correctness signal that structured Llama self-report misses on MAUD and FActScore. The paired AUROC delta lands at +0.260 and +0.262 across the two settings.</li>
+                <li><strong>Limit:</strong> probes do not detect legal or factual truth in an absolute sense. MAUD remains judge-proxy evidence until the frozen 30-claim human audit is analyzed.</li>
+                <li><strong>Claim:</strong> the GPT-5.4 external scorer is the strongest MAUD method, but its 0.944 AUROC inflates from same-family scorer-judge coupling. The defensible estimate is 0.872 under the independent judge.</li>
+                <li><strong>Limit:</strong> residual probes have not cleared SAE probes. Residual is stronger in the point estimate, but residual-minus-SAE intervals cross zero under judge 2 and on the agreement set.</li>
+                <li><strong>Limit:</strong> the residual correctness direction does not decompose into a small number of Goodfire layer-19 SAE features. A separate analysis (<a href="probe_interpretation.md">probe_interpretation.md</a>) found the signal distributed; the probe is a useful behavioral readout rather than a compact mechanism story.</li>
+                <li><strong>Limit:</strong> I have not tested other model families, other layers, or other claim extractors. All probes are layer 19 of Llama 3.1 8B Instruct. CUAD failed at the claim-extraction step before this protocol could run.</li>
               </ul>
             </div>
 
-            <h2 id="next">What's next</h2>
+            <h2 id="next">Next work</h2>
 
             <p>
               Three follow-ups would most sharpen the claim, in roughly this order.
@@ -1132,9 +1132,9 @@
               The 30-claim MAUD audit packet is frozen at <code>data/annotations/maud_human_audit_packet.jsonl</code>. Completed expert labels would convert MAUD's claim from "stable across two LLM judges" to "stable across two LLM judges, anchored to expert legal labels," or expose a systematic disagreement worth knowing about. Either outcome is publishable.
             </p>
 
-            <h3>Matched-generation transfer that does not collapse</h3>
+            <h3>Matched-generation transfer</h3>
             <p>
-              FActScore weakens the generation-mismatch worry but does not eliminate it. A matched-generation run on a dataset where Llama's claims do not routinely outrun the reference scope would close that gap. The FELM repair shows the failure mode to avoid: reference-bounded labels driven into <code>not_enough_evidence</code>.
+              FActScore reduces the generation-mismatch worry while leaving some of it open. A matched-generation run on a dataset where Llama's claims stay inside the reference scope would close that gap. The FELM repair shows the failure mode to avoid: reference-bounded labels driven into <code>not_enough_evidence</code>.
             </p>
 
             <h3>Layer sweep and second model family</h3>
@@ -1145,10 +1145,10 @@
             <div class="break">&middot; &middot; &middot;</div>
 
             <p>
-              The result is a bounded interpretability win. A linear readout of hidden activations sees something the model's own structured confidence misses, and the gap is the same size on legal QA and on biography factuality. It does not provide a compact SAE feature story, a legal-truth adjudicator, or a domain-general hallucination detector.
+              The result is a bounded interpretability win. A linear readout of hidden activations sees something the model's own structured confidence misses, and the gap is the same size on legal QA and on biography factuality. I do not claim a compact SAE feature story, a legal-truth adjudicator, or a domain-general hallucination detector.
             </p>
             <p>
-              The remaining questions sit on label provenance and matched-generation transfer, not on probe architecture. Downstream tools building on this should expose claim construction and label-provenance assumptions to users, rather than hiding them behind opaque confidence scores. The probe is only as honest as the labels it was trained on.
+              The remaining questions sit on label provenance and matched-generation transfer, not on probe architecture. Downstream tools building on this should expose claim construction and label-provenance assumptions to users rather than hiding them behind opaque confidence scores. The probe is only as honest as the labels it was trained on.
             </p>
 
           </div>
