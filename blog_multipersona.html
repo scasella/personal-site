@@ -7,7 +7,7 @@
   <meta name="description" content="A panel-of-experts scaffold produces wider per-sample search than a &lt;think&gt; monologue on Qwen3-30B-A3B, and the diversity creates RLVR gradient signal on olympiad math." />
   <meta name="author" content="Stephen Casella" />
   <meta name="robots" content="index, follow" />
-  <meta name="theme-color" content="#F9F9F6" />
+  <meta name="theme-color" content="#fafaf8" />
   <link rel="canonical" href="https://casella.dev/blog_multipersona.html" />
   <meta property="og:site_name" content="Stephen Casella" />
   <meta property="og:title" content="The diversity effect" />
@@ -81,562 +81,316 @@
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
-    /* ==========================================================
-       Design tokens
-       ========================================================== */
     :root {
-      --bg:           #F9F9F6;
-      --accent:       #090909;
-      --fg:           #3B3B39;
-      --fg-soft:      #3B3B39;
-      --fg-mute:      #595856;
-      --fg-faint:     #969592;
-      --on-dark:      #DFDEDA;
-      --surface-muted:#EFEFEB;
-
-      /* Chart palette, muted earth tones, harmonised with body */
-      --chart-primary:   #3B3B39;
-      --chart-secondary: #969592;
-      --chart-axis:      #C8C7C2;
-      --chart-grid:      #E4E3DE;
-      --chart-accent-1:  #5C8A95;  /* sage-teal */
-      --chart-accent-2:  #8B6F8C;  /* dusty mauve */
-
-      --font-serif: 'Libre Baskerville', Georgia, 'Times New Roman', serif;
-      --font-sans:  'Inter', 'Helvetica Neue', Arial, sans-serif;
+      --bg:           #fafaf8;
+      --paper:        #ffffff;
+      --fg:           #222;
+      --fg-mute:      #555;
+      --fg-faint:     #8a8a85;
+      --rule:         #e2e2dd;
+      --hi:           #f3f2ec;
+      --link:         #1a5fb4;
+      --link-visited: #5a3aa3;
+      --font-sans:    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono:    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     }
-
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-    html {
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
       background: var(--bg);
-      overflow-y: scroll;
-      scrollbar-color: #bbb #f4f4f4;
+      color: var(--fg);
+      font-family: var(--font-sans);
+      font-size: 16.5px;
+      line-height: 1.55;
       -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      text-rendering: optimizeLegibility;
-      font-kerning: normal;
-      font-variant-ligatures: common-ligatures contextual;
-      font-variant-numeric: oldstyle-nums proportional-nums;
-      font-optical-sizing: auto;
-      font-synthesis: none;
     }
-    html::-webkit-scrollbar { width: 16px; }
-    html::-webkit-scrollbar-track { background: #f4f4f4; }
-    html::-webkit-scrollbar-thumb { background: #bbb; border-radius: 5px; }
-
     ::selection { background: rgba(0,0,0,0.08); color: inherit; }
 
-    body {
-      min-height: 100vh;
-      font-family: var(--font-serif);
-      background: var(--bg);
-      color: var(--accent);
-      display: flex;
-      flex-direction: column;
-      text-wrap: pretty;
-      overflow-x: hidden;
+    .site-header {
+      max-width: 720px; margin: 0 auto; padding: 28px 24px 0;
+      display: flex; justify-content: space-between; align-items: baseline;
+      font-size: 13px; color: var(--fg-mute);
     }
+    .site-header a {
+      color: var(--fg-mute); text-decoration: none;
+      border-bottom: 1px dotted var(--fg-faint); padding-bottom: 1px;
+    }
+    .site-header a:hover { color: var(--fg); border-bottom-color: var(--fg); }
 
-    h1, h2, h3, .subtitle { text-wrap: balance; }
-
-    /* ==========================================================
-       Layout primitives
-       ========================================================== */
-    .page-surface {
-      background: var(--bg);
-      display: flex;
-      flex: 1 0 auto;
-      flex-direction: column;
-      width: 100%;
-    }
-    .main { flex: 1; }
-
-    /* ==========================================================
-       Header
-       ========================================================== */
-    .perspectives-header {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-      padding: 2rem 2.5rem;
-      width: 100%;
-    }
-    .header-link {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0.5rem 0.75rem;
-      border-radius: 999px;
-      color: var(--fg);
-      transition: background 240ms cubic-bezier(0.4, 0, 0.2, 1);
-      text-decoration: none;
-      font-family: var(--font-sans);
-      font-size: 13px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-    .header-link:first-child { margin-left: -0.75rem; }
-    .header-link:last-child { margin-right: -0.75rem; }
-    .header-link:hover, .header-link:focus-visible {
-      background: var(--surface-muted);
-    }
-
-    /* ==========================================================
-       Article layout
-       ========================================================== */
-    .benchmarks-content {
+    article {
       max-width: 720px;
       margin: 0 auto;
-      padding: 2rem 2rem 6rem;
+      padding: 24px 24px 64px;
     }
-    .benchmarks-content h1 {
-      font-size: 48px;
-      font-weight: 400;
-      line-height: 1.1;
-      letter-spacing: -0.01em;
-      color: var(--fg);
-      margin-top: 144px;
-    }
-    .benchmarks-content .subtitle {
-      font-size: 18px;
-      font-weight: 300;
-      line-height: 1.5;
-      color: var(--fg);
-      margin-top: 10px;
-      margin-bottom: 0.5em;
-    }
-    .benchmarks-content .date {
-      font-family: var(--font-sans);
-      font-size: 11px;
-      letter-spacing: 0.1em;
-      color: var(--fg-faint);
-      margin-top: 1em;
-      text-transform: uppercase;
+    .meta, .date {
+      color: var(--fg-faint); font-size: 13px;
+      margin-bottom: 8px; text-transform: none; letter-spacing: 0;
     }
 
+    h1 {
+      font-size: 32px; line-height: 1.22; font-weight: 600;
+      margin: 0 0 10px; letter-spacing: -0.01em; color: #111;
+    }
+    .subtitle {
+      color: var(--fg-mute); font-size: 17px; font-weight: 400;
+      line-height: 1.5; margin: 0 0 24px;
+    }
+    h2 {
+      font-size: 22px; font-weight: 600; line-height: 1.3;
+      margin: 1.9em 0 0.5em; letter-spacing: -0.005em; color: #111;
+    }
+    h3 { font-size: 17px; font-weight: 600; margin: 1.5em 0 0.35em; }
+
+    p { margin: 0 0 0.9em; }
+    ul, ol { margin: 0 0 1em; padding-left: 1.4em; }
+    li { margin-bottom: 0.35em; }
+    li::marker { color: var(--fg-faint); }
+
+    a { color: var(--link); text-decoration: underline; text-decoration-color: rgba(26,95,180,0.4); }
+    a:visited { color: var(--link-visited); }
+    a:hover { text-decoration-color: var(--link); }
+
+    code {
+      font-family: var(--font-mono); font-size: 0.85em;
+      background: var(--hi); padding: 1px 5px; border-radius: 3px;
+    }
+    pre {
+      background: var(--hi); padding: 14px 18px; border-radius: 8px;
+      overflow-x: auto; margin: 1em 0; font-size: 13px; line-height: 1.55;
+      white-space: pre-wrap; word-break: break-word;
+    }
+    pre code { background: none; padding: 0; border-radius: 0; font-size: inherit; }
+    strong { font-weight: 600; color: var(--fg); }
+    em { font-style: italic; }
+
+    blockquote {
+      margin: 1em 0; padding: 6px 0 6px 18px;
+      border-left: 3px solid var(--rule); color: var(--fg-mute);
+    }
+    blockquote p { font-size: 15.5px; margin: 0; }
+
+    /* Paper links / pill button */
     .paper-links {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin: 26px 0;
-      flex-wrap: wrap;
+      display: flex; align-items: center; gap: 0.75rem;
+      margin: 18px 0 8px; flex-wrap: wrap;
     }
     .paper-links .btn-pill {
-      font-family: var(--font-sans);
-      font-size: 14px;
-      line-height: 1;
-      color: var(--fg);
-      text-decoration: none;
-      background: #fff;
-      border-radius: 999px;
-      padding: 0.85rem 1.2rem 0.95rem;
-      transition: background 240ms cubic-bezier(0.4, 0, 0.2, 1);
+      font-size: 13px; line-height: 1; color: var(--fg);
+      text-decoration: none; background: var(--paper);
+      border: 1px solid var(--rule); border-radius: 999px;
+      padding: 0.55rem 0.95rem 0.65rem;
+      transition: background 200ms ease;
     }
-    .paper-links .btn-pill:hover { background: var(--surface-muted); }
+    .paper-links .btn-pill:hover { background: var(--hi); }
 
-    /* ==========================================================
-       Article body
-       ========================================================== */
-    .benchmarks-body { margin: 96px 0 48px; }
-
-    .benchmarks-body .body-main {
-      font-size: 17px;
-      line-height: 1.6;
-      margin-top: 1lh;
-    }
-    .benchmarks-body p {
-      font-weight: 400;
-      color: var(--fg-soft);
-      margin-bottom: 1lh;
-    }
-    .benchmarks-body em { font-style: italic; }
-    .benchmarks-body strong { font-weight: 500; color: var(--fg); }
-
-    .benchmarks-body a, .benchmarks-body a:visited {
-      color: var(--accent);
-      text-decoration: none;
-      border-bottom: 1px dotted var(--fg-faint);
-      padding-bottom: 1px;
-    }
-    .benchmarks-body a:hover { border-bottom-color: var(--accent); }
-
-    .benchmarks-body h2 {
-      font-size: 26px;
-      font-weight: 400;
-      color: var(--fg);
-      margin: 1.75lh 0 24px;
-      letter-spacing: -0.005em;
-    }
-    .benchmarks-body h3 {
-      font-size: 19px;
-      font-weight: 700;
-      color: var(--fg);
-      margin: 1.5lh 0 16px;
-      letter-spacing: -0.005em;
-    }
-
-    .benchmarks-body ul, .benchmarks-body ol {
-      padding-left: 1.25em;
-      margin-bottom: 1.5em;
-    }
-    .benchmarks-body ul { list-style: disc; }
-    .benchmarks-body ol { list-style: decimal; }
-    .benchmarks-body li {
-      font-size: 17px;
-      font-weight: 400;
-      line-height: 1.6;
-      color: var(--fg-soft);
-      margin-bottom: 0.6em;
-    }
-    .benchmarks-body li::marker { color: var(--fg-faint); }
-
-    .benchmarks-body code {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 0.82em;
-      background: rgba(0,0,0,0.05);
-      padding: 0.08em 0.3em;
-      border-radius: 4px;
-    }
-    .benchmarks-body pre {
-      background: rgba(0,0,0,0.05);
-      padding: 14px 18px;
-      border-radius: 8px;
-      overflow-x: auto;
-      margin: 1lh 0;
-      font-size: 13px;
-      line-height: 1.55;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-    .benchmarks-body pre code {
-      background: none; padding: 0; border-radius: 0; font-size: inherit;
-    }
-    pre .c { color: var(--fg-faint); font-style: italic; }
-    pre .k { color: var(--accent); }
-    pre .s { color: var(--fg); }
-
-    /* ==========================================================
-       TL;DR, pulled-quote treatment
-       ========================================================== */
+    /* TL;DR */
     .tldr {
-      margin: 32px 0 48px;
-      padding: 0 0 0 24px;
-      border-left: 2px solid var(--fg-mute);
+      margin: 1.2em 0 1.6em;
+      padding: 14px 18px;
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      font-size: 15.5px;
     }
-    .tldr-label {
-      font-family: var(--font-sans);
-      font-size: 11px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--fg-faint);
-      margin-bottom: 10px;
+    .tldr-label, .tldr .label {
       display: block;
+      font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--fg-faint); margin-bottom: 8px;
     }
-    .tldr p {
-      font-size: 17px;
-      font-weight: 400;
-      line-height: 1.6;
-      color: var(--fg);
-    }
-    .tldr p + p { margin-top: 0.8em; }
+    .tldr p { font-size: 15.5px; line-height: 1.6; color: var(--fg); margin: 0; }
+    .tldr p + p { margin-top: 0.6em; }
 
-    /* ==========================================================
-       Inline callout
-       ========================================================== */
+    /* Callout */
     .callout {
-      margin: 1.5lh 0;
-      padding: 20px 24px;
-      background: var(--surface-muted);
-      border-radius: 10px;
+      margin: 1.5em 0; padding: 14px 18px;
+      background: var(--hi); border-radius: 6px;
     }
     .callout-label {
-      font-family: var(--font-sans);
-      font-size: 11px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--fg-mute);
-      margin-bottom: 8px;
       display: block;
+      font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--fg-mute); margin-bottom: 8px;
     }
-    .callout p {
-      font-size: 15px;
-      font-weight: 400;
-      line-height: 1.6;
-      color: var(--fg);
-      margin-bottom: 0;
-    }
+    .callout p { font-size: 15px; line-height: 1.55; color: var(--fg); margin: 0; }
 
-    /* ==========================================================
-       Stat row, minimal numbers
-       ========================================================== */
+    /* Stat row */
     .stat-row {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 0;
-      margin: 1.5lh 0;
-      border-top: 1px solid var(--chart-grid);
-      border-bottom: 1px solid var(--chart-grid);
+      margin: 1.5em 0;
+      border-top: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
     }
     @media (min-width: 600px) {
       .stat-row { grid-template-columns: repeat(4, 1fr); }
     }
     .stat {
-      padding: 18px 18px;
-      border-right: 1px solid var(--chart-grid);
+      padding: 16px 18px;
+      border-right: 1px solid var(--rule);
     }
     .stat:first-child { padding-left: 0; }
     .stat:last-child { border-right: 0; }
     @media (max-width: 599px) {
       .stat:nth-child(2n) { border-right: 0; }
-      .stat:nth-child(n+3) { border-top: 1px solid var(--chart-grid); }
+      .stat:nth-child(n+3) { border-top: 1px solid var(--rule); }
     }
     .stat .k {
-      font-family: var(--font-sans);
-      font-size: 11px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--fg-faint);
-      margin-bottom: 8px;
       display: block;
+      font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--fg-faint); margin-bottom: 8px;
     }
     .stat .v {
-      font-family: var(--font-serif);
-      font-size: 24px;
-      font-weight: 400;
-      color: var(--fg);
-      line-height: 1.1;
-      letter-spacing: -0.01em;
+      font-size: 22px; font-weight: 600; color: var(--fg);
+      line-height: 1.1; letter-spacing: -0.01em;
     }
     .stat .s {
-      font-family: var(--font-sans);
-      font-size: 12px;
-      color: var(--fg-faint);
-      margin-top: 6px;
-      line-height: 1.35;
+      font-size: 12px; color: var(--fg-faint);
+      margin-top: 6px; line-height: 1.4;
     }
 
-    /* ==========================================================
-       Mode/method cards
-       ========================================================== */
+    /* Mode grid */
     .mode-grid {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 16px;
-      margin: 1.5lh 0;
+      gap: 14px;
+      margin: 1.5em 0;
     }
     @media (min-width: 600px) { .mode-grid { grid-template-columns: repeat(2, 1fr); } }
     .mode-card {
-      background: #fff;
-      border-radius: 12px;
-      padding: 20px 22px 22px;
-      border: 1px solid var(--chart-grid);
+      background: var(--paper);
+      border-radius: 8px;
+      padding: 16px 18px;
+      border: 1px solid var(--rule);
     }
     .mode-card .tag {
-      font-family: var(--font-sans);
-      font-size: 11px;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--fg-faint);
       display: block;
-      margin-bottom: 10px;
+      font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--fg-faint); margin-bottom: 8px;
     }
     .mode-card .t {
-      font-family: var(--font-serif);
-      font-size: 17px;
-      font-weight: 700;
-      color: var(--fg);
       display: block;
-      margin-bottom: 8px;
-      letter-spacing: -0.005em;
+      font-size: 16px; font-weight: 600; color: var(--fg);
+      margin-bottom: 6px; letter-spacing: -0.005em;
     }
     .mode-card .desc {
-      font-size: 14px;
-      font-weight: 400;
-      line-height: 1.55;
-      color: var(--fg-soft);
+      font-size: 14px; line-height: 1.5; color: var(--fg-mute);
     }
 
-    /* ==========================================================
-       Tables
-       ========================================================== */
-    .table-wrap {
-      margin: 1.5lh 0;
-    }
+    /* Table */
+    .table-wrap { margin: 1.5em 0; }
     .table-label {
-      font-family: var(--font-sans);
-      font-size: 11px;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--fg-faint);
-      margin-bottom: 12px;
+      font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--fg-faint); margin-bottom: 10px;
     }
     .table-label .id { color: var(--fg); margin-right: 12px; }
     table {
-      width: 100%;
-      border-collapse: collapse;
+      width: 100%; border-collapse: collapse; font-size: 14px;
       font-variant-numeric: tabular-nums;
-      font-family: var(--font-serif);
     }
     th, td {
-      padding: 11px 14px 11px 0;
-      text-align: left;
-      font-size: 14px;
-      font-weight: 400;
-      border-bottom: 1px solid var(--chart-grid);
-      color: var(--fg);
+      padding: 8px 12px 8px 0; text-align: left;
+      border-bottom: 1px solid var(--rule); color: var(--fg);
     }
     th {
-      font-family: var(--font-sans);
-      font-weight: 400;
-      color: var(--fg-mute);
-      font-size: 12px;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
+      font-weight: 600; color: var(--fg-mute);
+      font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em;
       border-bottom: 1px solid var(--fg-mute);
     }
-    td.num { font-variant-numeric: tabular-nums; color: var(--fg); }
-    td.pos { color: var(--accent); }
+    td.num { text-align: right; white-space: nowrap; }
+    td.pos { color: var(--fg); }
     td.neg { color: var(--fg-faint); }
     tr:last-child td { border-bottom: none; }
-    tr.highlight td { background: var(--surface-muted); }
-    tr.totals td { border-top: 1px solid var(--fg-mute); font-weight: 400; }
+    tr.highlight td { background: var(--hi); }
+    tr.totals td { border-top: 1px solid var(--fg-mute); }
 
-    /* ==========================================================
-       Figures / chart cards
-       ========================================================== */
-    figure.chart { margin: 1.5lh 0; }
-    figure.chart svg {
-      display: block;
-      width: 100%;
-      height: auto;
-      background: var(--bg);
+    /* Figure / chart */
+    figure.chart, figure { margin: 1.6em 0; }
+    figure svg, figure.chart svg {
+      display: block; width: 100%; height: auto;
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      border-radius: 4px;
     }
     figcaption {
-      font-family: var(--font-sans);
-      font-size: 13px;
-      color: var(--fg-mute);
-      line-height: 1.5;
-      margin-top: 16px;
+      font-size: 13px; color: var(--fg-mute);
+      line-height: 1.5; margin-top: 10px;
     }
     figcaption strong { color: var(--fg); font-weight: 500; }
-
     @media (min-width: 960px) {
-      .body-main > figure.chart {
-        width: min(1200px, calc(100vw - 3rem));
+      article > figure.chart, .body-main > figure.chart {
+        width: min(1100px, calc(100vw - 3rem));
         max-width: none;
         margin-left: 50%;
         transform: translateX(-50%);
       }
     }
-    @media (min-width: 1400px) {
-      .body-main > figure.chart {
-        width: min(1320px, calc(100vw - 3rem));
-      }
-    }
 
-    /* ==========================================================
-       Honest-scope list
-       ========================================================== */
+    /* Neg list */
     .neg-list {
-      margin: 1.5lh 0;
-      padding: 0;
-      border-top: 1px solid var(--chart-grid);
+      margin: 1.5em 0;
+      border-top: 1px solid var(--rule);
     }
     .neg-list-label {
-      font-family: var(--font-sans);
-      font-size: 11px;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--fg-faint);
-      margin: 16px 0 8px;
       display: block;
+      font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--fg-faint); margin: 14px 0 6px;
     }
     .neg-list ul { list-style: none; padding: 0; margin: 0; }
     .neg-list li {
-      padding: 16px 0;
-      border-bottom: 1px solid var(--chart-grid);
-      font-size: 15px;
-      font-weight: 400;
-      line-height: 1.6;
-      color: var(--fg-soft);
+      padding: 14px 0; border-bottom: 1px solid var(--rule);
+      font-size: 15px; line-height: 1.6; color: var(--fg-mute);
+      margin-bottom: 0;
     }
     .neg-list li:last-child { border-bottom: 0; }
-    .neg-list li strong { color: var(--fg); font-weight: 500; }
+    .neg-list li strong { color: var(--fg); font-weight: 600; }
 
-    /* ==========================================================
-       Section break
-       ========================================================== */
+    /* Break */
     .break {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 4rem 0 3rem;
+      display: flex; align-items: center; justify-content: center;
+      margin: 3rem 0 2.5rem;
       color: var(--fg-faint);
-      font-family: var(--font-sans);
-      font-size: 11px;
-      letter-spacing: 0.6em;
+      font-size: 11px; letter-spacing: 0.6em;
     }
 
-    /* ==========================================================
-       Responsive
-       ========================================================== */
-    @media (max-width: 768px) {
-      .perspectives-header { padding: 1.5rem 1.5rem; }
-      .benchmarks-content { padding: 3rem 1.5rem 4rem; }
-      .benchmarks-content h1 { font-size: 44px; margin-top: 120px; }
-      .benchmarks-body { margin: 72px 0 32px; }
-    }
+    hr { border: 0; border-top: 1px solid var(--rule); margin: 1.8em 0; }
+    .footer { font-size: 12.5px; color: var(--fg-faint); }
+
     @media (max-width: 480px) {
-      .perspectives-header { padding: 1.25rem 1.25rem; }
-      .benchmarks-content { padding: 2rem 1.25rem 3rem; }
-      .benchmarks-content h1 { font-size: 38px; margin-top: 80px; }
-      .benchmarks-content .subtitle { font-size: 18px; }
-      .benchmarks-body h2 { font-size: 26px; }
-      .benchmarks-body h3 { font-size: 20px; }
-      .benchmarks-body .body-main { font-size: 18px; }
-      .benchmarks-body li { font-size: 18px; }
-      .tldr p { font-size: 18px; }
-      .stat .v { font-size: 24px; }
+      .site-header { padding: 22px 20px 0; }
+      article { padding: 16px 20px 56px; }
+      h1 { font-size: 28px; }
+      .subtitle { font-size: 16px; }
+      .stat-row { grid-template-columns: 1fr; }
+      .mode-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
-<body class="benchmarks-page">
-  <div class="page-surface">
+<body>
+  <header class="site-header">
+    <a href="index.html">casella.dev</a>
+    <a href="blog_finetuning.html">~/next</a>
+  </header>
+  <article>
 
-    <header class="perspectives-header">
-      <a href="index.html" class="header-link">Home</a>
-      <a href="blog_interp.html" class="header-link">Next</a>
-    </header>
-
-    <main class="main">
-      <article class="benchmarks-content">
-
+        <p class="meta">April 2026</p>
         <h1>The diversity effect</h1>
         <p class="subtitle">A panel-of-experts scaffold changes RL-trained reasoning by widening per-sample search, then turns that diversity into RLVR signal on olympiad math.</p>
-        <p class="date">STEPHEN CASELLA · APRIL 2026</p>
 
         <div class="paper-links">
           <a href="https://github.com/scasella/multi-model" class="btn-pill">GitHub repo</a>
-          <a href="./case_study/gallery.html" class="btn-pill">20-problem gallery</a>
         </div>
 
-        <div class="benchmarks-body">
-          <div class="body-main">
-
-            <div class="tldr">
+        <div class="tldr">
               <span class="tldr-label">TL;DR</span>
               <p>
                 I post-trained the same backbone two ways. Trained as a panel of experts arguing inside a debate tag, it produces reasoning traces that sit <strong>+78.2%</strong> further apart in mpnet-space on MATH500 (paired t = 5.91, p &lt; 10⁻⁸) and <strong>+75.6%</strong> further apart on AIME (t = 4.72, p &lt; 10⁻⁵) than the same model post-trained to think privately. The pass@k gap to Qwen3-thinking narrows monotonically in k across three independent slices.
               </p>
               <p>
-                <strong>Deployment cost.</strong> On the 374 paired draws across MATH500 L5 and AIME 24+25 where both arms produced a correct answer, thinking uses <strong>5.9-6.9× more tokens (median)</strong> than the panel, and it runs longer than the panel in <strong>99.6-99.7%</strong> of all paired draws regardless of correctness. At the cost-per-correct-answer level, total tokens divided by correct samples, thinking is <strong>2.5-5×</strong> more expensive than the panel. Per-sample accuracy still favors thinking; per-token efficiency reverses the comparison. The <a href="../case_study/gallery.html">20-problem side-by-side gallery</a> shows the asymmetry row by row. (Wilcoxon signed-rank: <em>p</em> = 6×10⁻⁵² on MATH, <em>p</em> = 8×10⁻¹³ on AIME.)
+                <strong>Deployment cost.</strong> On the 374 paired draws across MATH500 L5 and AIME 24+25 where both arms produced a correct answer, thinking uses <strong>5.9-6.9× more tokens (median)</strong> than the panel, and it runs longer than the panel in <strong>99.6-99.7%</strong> of all paired draws regardless of correctness. At the cost-per-correct-answer level, total tokens divided by correct samples, thinking is <strong>2.5-5×</strong> more expensive than the panel. Per-sample accuracy still favors thinking; per-token efficiency reverses the comparison. (Wilcoxon signed-rank: <em>p</em> = 6×10⁻⁵² on MATH, <em>p</em> = 8×10⁻¹³ on AIME.)
               </p>
               <p>
-                <strong>Apr 25 update.</strong> Wider per-sample search shows up where it matters for RL. On a fresh 877-problem olympiad pool the panel has 382 variance-band problems against thinking's 209: the only regime where group-relative RLVR generates non-zero gradient, and a <strong>1.83×</strong> ratio in panel's favor. 100 RL steps on that band carry panel from 14% to 29% on a shared held-out, with per-source gains scaling with training-pool representation. Training adapter: LoRA rank 32 on the frozen base, four to five orders of magnitude under the baseline's post-training compute.
+                <strong>Apr 25 update.</strong> Wider per-sample search shows up where it matters for RL. On a fresh 877-problem olympiad pool the panel has 382 variance-band problems against thinking's 209: the only regime where group-relative RLVR generates non-zero gradient, and a <strong>1.83×</strong> ratio in panel's favor. 100 RL steps on that band carry panel from 14% to 29% on a shared held-out. That's about half of vanilla thinking's pre-RL ~60% on the same problems, but more than double panel's own starting point. Training adapter: LoRA rank 32 on the frozen base, four to five orders of magnitude under the baseline's post-training compute. A matched-compute thinking LoRA would distinguish scaffold from RL recipe. That experiment has not yet run.
               </p>
             </div>
 
@@ -655,7 +409,7 @@
             </div>
 
             <p>
-              Two benchmarks, paired significance tests, and a mechanical check on pass@k say it reasons differently. Each panel sample covers more of the solution surface than each thinking sample. Successive panel samples add more marginal coverage than successive thinking samples. Same coin, two sides: search that's wider per sample and compounds over k. The cost is single-shot accuracy. Every property that depends on sampling more than once moves the other way.
+              Two benchmarks, paired significance tests, and a mechanical check on pass@k (the chance that at least one of k sampled attempts is correct) say it reasons differently. Each panel sample covers more of the solution surface than each thinking sample. Successive panel samples add more marginal coverage than successive thinking samples. Same coin, two sides: search that's wider per sample and compounds over k. The cost is single-shot accuracy. Every property that depends on sampling more than once moves the other way.
             </p>
 
             <h2 id="setup">Setup: one backbone, two scaffolds</h2>
@@ -833,10 +587,10 @@
 
             <figure class="chart">
               <svg viewBox="0 0 960 460" role="img" aria-label="Matched pass@k, panel vs thinking on AIME 2024+2025 at n=16">
-                <rect x="0" y="0" width="960" height="460" fill="#F9F9F6" />
+                <rect x="0" y="0" width="960" height="460" fill="#ffffff" />
 
                 <text x="480" y="30" text-anchor="middle" fill="#3B3B39"
-                      font-family="Libre Baskerville, Georgia, serif" font-size="18" font-weight="400">
+                      font-family="Inter, sans-serif" font-size="18" font-weight="400">
                   Pass@k on AIME 2024+25 (n=16, 20 problems)
                 </text>
                 <text x="480" y="54" text-anchor="middle" fill="#969592"
@@ -955,7 +709,7 @@
               The pass@k story says: <em>at fixed sample count, panel closes the gap with k.</em> Deployment adds a cost question: <em>at fixed correctness, which scaffold uses fewer tokens?</em> Cosine distances and pass@k curves are mechanism-level results. Tokens-per-correct-answer shows up on the bill.
             </p>
             <p>
-              I re-joined the existing eval rollouts pairwise on (problem, sample-index), using the same prompts, same temperature, and same max-token budgets, then read the <code>completion_tokens</code> field that sampling wrote out. No re-tokenization, no embeddings, no judgment calls. The comparison is paired by construction. For the same finding in concrete form, the <a href="../case_study/gallery.html">20-problem side-by-side gallery</a> renders one panel and one thinking sample on each problem in adjacent columns.
+              I re-joined the existing eval rollouts pairwise on (problem, sample-index), using the same prompts, same temperature, and same max-token budgets, then read the <code>completion_tokens</code> field that sampling wrote out. No re-tokenization, no embeddings, no judgment calls. The comparison is paired by construction.
             </p>
 
             <div class="stat-row">
@@ -1112,10 +866,10 @@
             <h2 id="rlvr">From wider search to faster hill-climbing</h2>
 
             <p>
-              The original draft promised a third benchmark as the next step. The follow-up went further. Instead of a pass@k replication on a new dataset, I tested whether per-sample diversity converts into gradient signal under RLVR.
+              The original draft promised a third benchmark as the next step. The follow-up went further. Instead of a pass@k replication on a new dataset, I tested whether per-sample diversity converts into gradient signal under RLVR (reinforcement learning where the reward is whether the final answer is verifiably correct).
             </p>
             <p>
-              Group-relative RLVR (GRPO, RLOO) only produces non-zero advantage when a group of rollouts on the same problem contains both correct and incorrect samples. The <em>variance band</em>, problems with 0 &lt; pass@G &lt; 1, is the only regime that contributes to the policy gradient. Wider per-sample search predicts a wider variance band: more rollouts that fall outside both ceilings, more problems with usable advantage, more trainable data.
+              Group-relative RLVR algorithms (GRPO and RLOO, which score each rollout against the others in its batch rather than against a separate critic model) only produce non-zero advantage when a group of rollouts on the same problem contains both correct and incorrect samples. The <em>variance band</em>, problems with 0 &lt; pass@G &lt; 1, is the only regime that contributes to the policy gradient. Wider per-sample search predicts a wider variance band: more rollouts that fall outside both ceilings, more problems with usable advantage, more trainable data.
             </p>
             <p>
               The pool: 877 olympiad problems from HMMT 2024+25, AIME 2024+25, the OlympiadBench math/English/competition split, and AMC. Each problem was sampled G=8 times per arm at temperature 1.0 and sorted into <code>all_zero</code> (none correct), <code>variance_band</code> (1–7 of 8 correct), or <code>all_one</code> (all 8 correct). Variance band carries gradient. The other two cells are training dead weight under group-relative RLVR.
@@ -1219,10 +973,10 @@
 
             <figure class="chart">
               <svg viewBox="0 0 960 460" role="img" aria-label="Panel held-out pass@1 vs RL step on the 100-problem stratified held-out">
-                <rect x="0" y="0" width="960" height="460" fill="#F9F9F6" />
+                <rect x="0" y="0" width="960" height="460" fill="#ffffff" />
 
                 <text x="480" y="30" text-anchor="middle" fill="#3B3B39"
-                      font-family="Libre Baskerville, Georgia, serif" font-size="18" font-weight="400">
+                      font-family="Inter, sans-serif" font-size="18" font-weight="400">
                   Held-out pass@1 vs RL step (panel arm, 100 RL steps)
                 </text>
                 <text x="480" y="54" text-anchor="middle" fill="#969592"
@@ -1438,11 +1192,6 @@
               Scaffold choice is a lever, and it costs nothing at inference. The remaining questions narrow to three: matched <code>&lt;think&gt;</code> RL versus panel RL under the same recipe, semantic diversity on a post-RL checkpoint, and the asymptote at larger n. A later experiment can ask what a full post-training pipeline could do with a panel scaffold instead of against one.
             </p>
 
-          </div>
-        </div>
-      </article>
-    </main>
-
-  </div>
+            </article>
 </body>
 </html>

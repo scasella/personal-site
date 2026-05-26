@@ -7,7 +7,7 @@
   <meta name="description" content="A claim-level uncertainty study: Llama 3.1 8B's structured confidence is near-random on MAUD legal QA and FActScore biographies. A linear readout of layer-19 residual activations recovers correctness signal that the model's own answer does not surface." />
   <meta name="author" content="Stephen Casella" />
   <meta name="robots" content="index, follow" />
-  <meta name="theme-color" content="#F9F9F6" />
+  <meta name="theme-color" content="#fafaf8" />
   <link rel="canonical" href="https://casella.dev/blog_interp.html" />
   <meta property="og:site_name" content="Stephen Casella" />
   <meta property="og:title" content="Hidden activations know when self-report does not" />
@@ -81,495 +81,310 @@
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg:           #F9F9F6;
-      --accent:       #090909;
-      --fg:           #3B3B39;
-      --fg-soft:      #3B3B39;
-      --fg-mute:      #595856;
-      --fg-faint:     #969592;
-      --on-dark:      #DFDEDA;
-      --surface-muted:#EFEFEB;
-      --chart-primary:   #3B3B39;
-      --chart-secondary: #969592;
-      --chart-axis:      #C8C7C2;
-      --chart-grid:      #E4E3DE;
-      --chart-accent-1:  #5C8A95;
-      --chart-accent-2:  #8B6F8C;
-      --font-serif: 'Libre Baskerville', Georgia, 'Times New Roman', serif;
-      --font-sans:  'Inter', 'Helvetica Neue', Arial, sans-serif;
+      --bg:           #fafaf8;
+      --paper:        #ffffff;
+      --fg:           #222;
+      --fg-mute:      #555;
+      --fg-faint:     #8a8a85;
+      --rule:         #e2e2dd;
+      --hi:           #f3f2ec;
+      --link:         #1a5fb4;
+      --link-visited: #5a3aa3;
+      --font-sans:    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono:    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     }
-
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-    html {
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
       background: var(--bg);
-      overflow-y: scroll;
-      scrollbar-color: #bbb #f4f4f4;
+      color: var(--fg);
+      font-family: var(--font-sans);
+      font-size: 16.5px;
+      line-height: 1.55;
       -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      text-rendering: optimizeLegibility;
-      font-kerning: normal;
-      font-variant-ligatures: common-ligatures contextual;
-      font-variant-numeric: oldstyle-nums proportional-nums;
-      font-optical-sizing: auto;
-      font-synthesis: none;
     }
-    html::-webkit-scrollbar { width: 16px; }
-    html::-webkit-scrollbar-track { background: #f4f4f4; }
-    html::-webkit-scrollbar-thumb { background: #bbb; border-radius: 5px; }
-
     ::selection { background: rgba(0,0,0,0.08); color: inherit; }
 
-    body {
-      min-height: 100vh;
-      font-family: var(--font-serif);
-      background: var(--bg);
-      color: var(--accent);
-      display: flex;
-      flex-direction: column;
-      text-wrap: pretty;
-      overflow-x: hidden;
+    .site-header {
+      max-width: 720px; margin: 0 auto; padding: 28px 24px 0;
+      display: flex; justify-content: space-between; align-items: baseline;
+      font-size: 13px; color: var(--fg-mute);
     }
-
-    h1, h2, h3, .subtitle { text-wrap: balance; }
-
-    .page-surface {
-      background: var(--bg);
-      display: flex;
-      flex: 1 0 auto;
-      flex-direction: column;
-      width: 100%;
+    .site-header a {
+      color: var(--fg-mute); text-decoration: none;
+      border-bottom: 1px dotted var(--fg-faint); padding-bottom: 1px;
     }
-    .main { flex: 1; }
+    .site-header a:hover { color: var(--fg); border-bottom-color: var(--fg); }
 
-    .perspectives-header {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-      padding: 2rem 2.5rem;
-      width: 100%;
-    }
-    .header-link {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0.5rem 0.75rem;
-      border-radius: 999px;
-      color: var(--fg);
-      transition: background 240ms cubic-bezier(0.4, 0, 0.2, 1);
-      text-decoration: none;
-      font-family: var(--font-sans);
-      font-size: 13px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-    .header-link:first-child { margin-left: -0.75rem; }
-    .header-link:last-child { margin-right: -0.75rem; }
-    .header-link:hover, .header-link:focus-visible { background: var(--surface-muted); }
-
-    .benchmarks-content {
+    article {
       max-width: 720px;
       margin: 0 auto;
-      padding: 2rem 2rem 6rem;
+      padding: 24px 24px 64px;
     }
-    .benchmarks-content h1 {
-      font-size: 48px;
-      font-weight: 400;
-      line-height: 1.1;
-      letter-spacing: -0.01em;
-      color: var(--fg);
-      margin-top: 144px;
-    }
-    .benchmarks-content .subtitle {
-      font-size: 18px;
-      font-weight: 300;
-      line-height: 1.5;
-      color: var(--fg);
-      margin-top: 10px;
-      margin-bottom: 0.5em;
-    }
-    .benchmarks-content .date {
-      font-family: var(--font-sans);
-      font-size: 11px;
-      letter-spacing: 0.1em;
-      color: var(--fg-faint);
-      margin-top: 1em;
-      text-transform: uppercase;
+    .meta, .date {
+      color: var(--fg-faint); font-size: 13px;
+      margin-bottom: 8px; text-transform: none; letter-spacing: 0;
     }
 
+    h1 {
+      font-size: 32px; line-height: 1.22; font-weight: 600;
+      margin: 0 0 10px; letter-spacing: -0.01em; color: #111;
+    }
+    .subtitle {
+      color: var(--fg-mute); font-size: 17px; font-weight: 400;
+      line-height: 1.5; margin: 0 0 24px;
+    }
+    h2 {
+      font-size: 22px; font-weight: 600; line-height: 1.3;
+      margin: 1.9em 0 0.5em; letter-spacing: -0.005em; color: #111;
+    }
+    h3 { font-size: 17px; font-weight: 600; margin: 1.5em 0 0.35em; }
+
+    p { margin: 0 0 0.9em; }
+    ul, ol { margin: 0 0 1em; padding-left: 1.4em; }
+    li { margin-bottom: 0.35em; }
+    li::marker { color: var(--fg-faint); }
+
+    a { color: var(--link); text-decoration: underline; text-decoration-color: rgba(26,95,180,0.4); }
+    a:visited { color: var(--link-visited); }
+    a:hover { text-decoration-color: var(--link); }
+
+    code {
+      font-family: var(--font-mono); font-size: 0.85em;
+      background: var(--hi); padding: 1px 5px; border-radius: 3px;
+    }
+    pre {
+      background: var(--hi); padding: 14px 18px; border-radius: 8px;
+      overflow-x: auto; margin: 1em 0; font-size: 13px; line-height: 1.55;
+      white-space: pre-wrap; word-break: break-word;
+    }
+    pre code { background: none; padding: 0; border-radius: 0; font-size: inherit; }
+    strong { font-weight: 600; color: var(--fg); }
+    em { font-style: italic; }
+
+    blockquote {
+      margin: 1em 0; padding: 6px 0 6px 18px;
+      border-left: 3px solid var(--rule); color: var(--fg-mute);
+    }
+    blockquote p { font-size: 15.5px; margin: 0; }
+
+    /* Paper links / pill button */
     .paper-links {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin: 26px 0;
-      flex-wrap: wrap;
+      display: flex; align-items: center; gap: 0.75rem;
+      margin: 18px 0 8px; flex-wrap: wrap;
     }
     .paper-links .btn-pill {
-      font-family: var(--font-sans);
-      font-size: 14px;
-      line-height: 1;
-      color: var(--fg);
-      text-decoration: none;
-      background: #fff;
-      border-radius: 999px;
-      padding: 0.85rem 1.2rem 0.95rem;
-      transition: background 240ms cubic-bezier(0.4, 0, 0.2, 1);
+      font-size: 13px; line-height: 1; color: var(--fg);
+      text-decoration: none; background: var(--paper);
+      border: 1px solid var(--rule); border-radius: 999px;
+      padding: 0.55rem 0.95rem 0.65rem;
+      transition: background 200ms ease;
     }
-    .paper-links .btn-pill:hover { background: var(--surface-muted); }
+    .paper-links .btn-pill:hover { background: var(--hi); }
 
-    .benchmarks-body { margin: 96px 0 48px; }
-    .benchmarks-body .body-main {
-      font-size: 17px;
-      line-height: 1.6;
-      margin-top: 1lh;
-    }
-    .benchmarks-body p {
-      font-weight: 400;
-      color: var(--fg-soft);
-      margin-bottom: 1lh;
-    }
-    .benchmarks-body em { font-style: italic; }
-    .benchmarks-body strong { font-weight: 500; color: var(--fg); }
-    .benchmarks-body a, .benchmarks-body a:visited {
-      color: var(--accent);
-      text-decoration: none;
-      border-bottom: 1px dotted var(--fg-faint);
-      padding-bottom: 1px;
-    }
-    .benchmarks-body a:hover { border-bottom-color: var(--accent); }
-    .benchmarks-body h2 {
-      font-size: 26px;
-      font-weight: 400;
-      color: var(--fg);
-      margin: 1.75lh 0 24px;
-      letter-spacing: -0.005em;
-    }
-    .benchmarks-body h3 {
-      font-size: 19px;
-      font-weight: 700;
-      color: var(--fg);
-      margin: 1.5lh 0 16px;
-      letter-spacing: -0.005em;
-    }
-    .benchmarks-body ul, .benchmarks-body ol {
-      padding-left: 1.25em;
-      margin-bottom: 1.5em;
-    }
-    .benchmarks-body ul { list-style: disc; }
-    .benchmarks-body ol { list-style: decimal; }
-    .benchmarks-body li {
-      font-size: 17px;
-      font-weight: 400;
-      line-height: 1.6;
-      color: var(--fg-soft);
-      margin-bottom: 0.6em;
-    }
-    .benchmarks-body li::marker { color: var(--fg-faint); }
-    .benchmarks-body code {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 0.82em;
-      background: rgba(0,0,0,0.05);
-      padding: 0.08em 0.3em;
-      border-radius: 4px;
-    }
-    .benchmarks-body pre {
-      background: rgba(0,0,0,0.05);
-      padding: 14px 18px;
-      border-radius: 8px;
-      overflow-x: auto;
-      margin: 1lh 0;
-      font-size: 13px;
-      line-height: 1.55;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-    .benchmarks-body pre code {
-      background: none; padding: 0; border-radius: 0; font-size: inherit;
-    }
-
+    /* TL;DR */
     .tldr {
-      margin: 32px 0 48px;
-      padding: 0 0 0 24px;
-      border-left: 2px solid var(--fg-mute);
+      margin: 1.2em 0 1.6em;
+      padding: 14px 18px;
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      font-size: 15.5px;
     }
-    .tldr-label {
-      font-family: var(--font-sans);
-      font-size: 11px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--fg-faint);
-      margin-bottom: 10px;
+    .tldr-label, .tldr .label {
       display: block;
+      font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--fg-faint); margin-bottom: 8px;
     }
-    .tldr p {
-      font-size: 17px;
-      font-weight: 400;
-      line-height: 1.6;
-      color: var(--fg);
-    }
-    .tldr p + p { margin-top: 0.8em; }
+    .tldr p { font-size: 15.5px; line-height: 1.6; color: var(--fg); margin: 0; }
+    .tldr p + p { margin-top: 0.6em; }
 
+    /* Callout */
     .callout {
-      margin: 1.5lh 0;
-      padding: 20px 24px;
-      background: var(--surface-muted);
-      border-radius: 10px;
+      margin: 1.5em 0; padding: 14px 18px;
+      background: var(--hi); border-radius: 6px;
     }
     .callout-label {
-      font-family: var(--font-sans);
-      font-size: 11px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--fg-mute);
-      margin-bottom: 8px;
       display: block;
+      font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--fg-mute); margin-bottom: 8px;
     }
-    .callout p {
-      font-size: 15px;
-      font-weight: 400;
-      line-height: 1.6;
-      color: var(--fg);
-      margin-bottom: 0;
-    }
+    .callout p { font-size: 15px; line-height: 1.55; color: var(--fg); margin: 0; }
 
+    /* Stat row */
     .stat-row {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 0;
-      margin: 1.5lh 0;
-      border-top: 1px solid var(--chart-grid);
-      border-bottom: 1px solid var(--chart-grid);
+      margin: 1.5em 0;
+      border-top: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
     }
     @media (min-width: 600px) {
       .stat-row { grid-template-columns: repeat(4, 1fr); }
     }
     .stat {
-      padding: 18px 18px;
-      border-right: 1px solid var(--chart-grid);
+      padding: 16px 18px;
+      border-right: 1px solid var(--rule);
     }
     .stat:first-child { padding-left: 0; }
     .stat:last-child { border-right: 0; }
     @media (max-width: 599px) {
       .stat:nth-child(2n) { border-right: 0; }
-      .stat:nth-child(n+3) { border-top: 1px solid var(--chart-grid); }
+      .stat:nth-child(n+3) { border-top: 1px solid var(--rule); }
     }
     .stat .k {
-      font-family: var(--font-sans);
-      font-size: 11px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--fg-faint);
-      margin-bottom: 8px;
       display: block;
+      font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--fg-faint); margin-bottom: 8px;
     }
     .stat .v {
-      font-family: var(--font-serif);
-      font-size: 24px;
-      font-weight: 400;
-      color: var(--fg);
-      line-height: 1.1;
-      letter-spacing: -0.01em;
+      font-size: 22px; font-weight: 600; color: var(--fg);
+      line-height: 1.1; letter-spacing: -0.01em;
     }
     .stat .s {
-      font-family: var(--font-sans);
-      font-size: 12px;
-      color: var(--fg-faint);
-      margin-top: 6px;
-      line-height: 1.35;
+      font-size: 12px; color: var(--fg-faint);
+      margin-top: 6px; line-height: 1.4;
     }
 
+    /* Mode grid */
     .mode-grid {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 16px;
-      margin: 1.5lh 0;
+      gap: 14px;
+      margin: 1.5em 0;
     }
     @media (min-width: 600px) { .mode-grid { grid-template-columns: repeat(2, 1fr); } }
     .mode-card {
-      background: #fff;
-      border-radius: 12px;
-      padding: 20px 22px 22px;
-      border: 1px solid var(--chart-grid);
+      background: var(--paper);
+      border-radius: 8px;
+      padding: 16px 18px;
+      border: 1px solid var(--rule);
     }
     .mode-card .tag {
-      font-family: var(--font-sans);
-      font-size: 11px;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--fg-faint);
       display: block;
-      margin-bottom: 10px;
+      font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--fg-faint); margin-bottom: 8px;
     }
     .mode-card .t {
-      font-family: var(--font-serif);
-      font-size: 17px;
-      font-weight: 700;
-      color: var(--fg);
       display: block;
-      margin-bottom: 8px;
-      letter-spacing: -0.005em;
+      font-size: 16px; font-weight: 600; color: var(--fg);
+      margin-bottom: 6px; letter-spacing: -0.005em;
     }
     .mode-card .desc {
-      font-size: 14px;
-      font-weight: 400;
-      line-height: 1.55;
-      color: var(--fg-soft);
+      font-size: 14px; line-height: 1.5; color: var(--fg-mute);
     }
 
-    .table-wrap { margin: 1.5lh 0; }
+    /* Table */
+    .table-wrap { margin: 1.5em 0; }
     .table-label {
-      font-family: var(--font-sans);
-      font-size: 11px;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--fg-faint);
-      margin-bottom: 12px;
+      font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--fg-faint); margin-bottom: 10px;
     }
     .table-label .id { color: var(--fg); margin-right: 12px; }
     table {
-      width: 100%;
-      border-collapse: collapse;
+      width: 100%; border-collapse: collapse; font-size: 14px;
       font-variant-numeric: tabular-nums;
-      font-family: var(--font-serif);
     }
     th, td {
-      padding: 11px 14px 11px 0;
-      text-align: left;
-      font-size: 14px;
-      font-weight: 400;
-      border-bottom: 1px solid var(--chart-grid);
-      color: var(--fg);
+      padding: 8px 12px 8px 0; text-align: left;
+      border-bottom: 1px solid var(--rule); color: var(--fg);
     }
     th {
-      font-family: var(--font-sans);
-      font-weight: 400;
-      color: var(--fg-mute);
-      font-size: 12px;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
+      font-weight: 600; color: var(--fg-mute);
+      font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em;
       border-bottom: 1px solid var(--fg-mute);
     }
-    td.num { font-variant-numeric: tabular-nums; color: var(--fg); }
-    td.pos { color: var(--accent); }
+    td.num { text-align: right; white-space: nowrap; }
+    td.pos { color: var(--fg); }
     td.neg { color: var(--fg-faint); }
     tr:last-child td { border-bottom: none; }
-    tr.highlight td { background: var(--surface-muted); }
-    tr.totals td { border-top: 1px solid var(--fg-mute); font-weight: 400; }
+    tr.highlight td { background: var(--hi); }
+    tr.totals td { border-top: 1px solid var(--fg-mute); }
 
-    figure.chart { margin: 1.5lh 0; }
-    figure.chart svg {
-      display: block;
-      width: 100%;
-      height: auto;
-      background: var(--bg);
+    /* Figure / chart */
+    figure.chart, figure { margin: 1.6em 0; }
+    figure svg, figure.chart svg {
+      display: block; width: 100%; height: auto;
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      border-radius: 4px;
     }
     figcaption {
-      font-family: var(--font-sans);
-      font-size: 13px;
-      color: var(--fg-mute);
-      line-height: 1.5;
-      margin-top: 16px;
+      font-size: 13px; color: var(--fg-mute);
+      line-height: 1.5; margin-top: 10px;
     }
     figcaption strong { color: var(--fg); font-weight: 500; }
     @media (min-width: 960px) {
-      .body-main > figure.chart {
-        width: min(1200px, calc(100vw - 3rem));
+      article > figure.chart, .body-main > figure.chart {
+        width: min(1100px, calc(100vw - 3rem));
         max-width: none;
         margin-left: 50%;
         transform: translateX(-50%);
       }
     }
-    @media (min-width: 1400px) {
-      .body-main > figure.chart { width: min(1320px, calc(100vw - 3rem)); }
-    }
 
+    /* Neg list */
     .neg-list {
-      margin: 1.5lh 0;
-      padding: 0;
-      border-top: 1px solid var(--chart-grid);
+      margin: 1.5em 0;
+      border-top: 1px solid var(--rule);
     }
     .neg-list-label {
-      font-family: var(--font-sans);
-      font-size: 11px;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--fg-faint);
-      margin: 16px 0 8px;
       display: block;
+      font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--fg-faint); margin: 14px 0 6px;
     }
     .neg-list ul { list-style: none; padding: 0; margin: 0; }
     .neg-list li {
-      padding: 16px 0;
-      border-bottom: 1px solid var(--chart-grid);
-      font-size: 15px;
-      font-weight: 400;
-      line-height: 1.6;
-      color: var(--fg-soft);
+      padding: 14px 0; border-bottom: 1px solid var(--rule);
+      font-size: 15px; line-height: 1.6; color: var(--fg-mute);
+      margin-bottom: 0;
     }
     .neg-list li:last-child { border-bottom: 0; }
-    .neg-list li strong { color: var(--fg); font-weight: 500; }
+    .neg-list li strong { color: var(--fg); font-weight: 600; }
 
+    /* Break */
     .break {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 4rem 0 3rem;
+      display: flex; align-items: center; justify-content: center;
+      margin: 3rem 0 2.5rem;
       color: var(--fg-faint);
-      font-family: var(--font-sans);
-      font-size: 11px;
-      letter-spacing: 0.6em;
+      font-size: 11px; letter-spacing: 0.6em;
     }
 
-    @media (max-width: 768px) {
-      .perspectives-header { padding: 1.5rem 1.5rem; }
-      .benchmarks-content { padding: 3rem 1.5rem 4rem; }
-      .benchmarks-content h1 { font-size: 44px; margin-top: 120px; }
-      .benchmarks-body { margin: 72px 0 32px; }
-    }
+    hr { border: 0; border-top: 1px solid var(--rule); margin: 1.8em 0; }
+    .footer { font-size: 12.5px; color: var(--fg-faint); }
+
     @media (max-width: 480px) {
-      .perspectives-header { padding: 1.25rem 1.25rem; }
-      .benchmarks-content { padding: 2rem 1.25rem 3rem; }
-      .benchmarks-content h1 { font-size: 38px; margin-top: 80px; }
-      .benchmarks-content .subtitle { font-size: 18px; }
-      .benchmarks-body h2 { font-size: 26px; }
-      .benchmarks-body h3 { font-size: 20px; }
-      .benchmarks-body .body-main { font-size: 18px; }
-      .benchmarks-body li { font-size: 18px; }
-      .tldr p { font-size: 18px; }
-      .stat .v { font-size: 24px; }
+      .site-header { padding: 22px 20px 0; }
+      article { padding: 16px 20px 56px; }
+      h1 { font-size: 28px; }
+      .subtitle { font-size: 16px; }
+      .stat-row { grid-template-columns: 1fr; }
+      .mode-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
-<body class="benchmarks-page">
-  <div class="page-surface">
+<body>
+  <header class="site-header">
+    <a href="index.html">casella.dev</a>
+    <a href="blog_multipersona.html">~/next</a>
+  </header>
+  <article>
 
-    <header class="perspectives-header">
-      <a href="index.html" class="header-link">Home</a>
-      <a href="blog_multipersona.html" class="header-link">Next</a>
-    </header>
-
-    <main class="main">
-      <article class="benchmarks-content">
-
+        <p class="meta">April 2026</p>
         <h1>Hidden activations know when self-report does not</h1>
-        <p class="subtitle">A linear readout of layer-19 residual activations recovers claim-level correctness signal that Llama 3.1 8B's structured self-report misses across legal QA and biography factuality.</p>
-        <p class="date">STEPHEN CASELLA &middot; APRIL 2026</p>
+        <p class="subtitle">A classifier on Llama 3.1 8B's internal activations recovers claim-level correctness signal that the model's own confidence answers miss across legal QA and biography factuality.</p>
 
         <div class="paper-links">
           <a href="https://github.com/scasella/activation-probes-claim-correctness" class="btn-pill">GitHub repo</a>
         </div>
 
-        <div class="benchmarks-body">
-          <div class="body-main">
-
-            <div class="tldr">
+        <div class="tldr">
               <span class="tldr-label">TL;DR</span>
               <p>
-                Llama 3.1 8B's structured self-report misses unreliable claims in long-form answers. On MAUD merger-agreement QA under a GPT-5.4 judge, self-report reaches <strong>0.511 AUROC</strong>; a logistic regression on layer-19 residual activations reaches <strong>0.771</strong>, paired delta <strong>+0.260 [0.137, 0.387]</strong>. On FActScore biographies under human atomic-fact labels, self-report reaches <strong>0.541</strong> and the residual probe reaches <strong>0.802</strong>, paired delta <strong>+0.262 [0.219, 0.302]</strong>.
+                Llama 3.1 8B misses unreliable claims in its own long-form answers when you ask it directly. A classifier trained on the model's internal activations does much better. On MAUD merger-agreement QA, asking the model reaches <strong>AUROC 0.511</strong> (chance is 0.5); the classifier reaches <strong>0.771</strong>, a paired bootstrap gain of <strong>+0.260 [0.137, 0.387]</strong>. On FActScore biographies under human atomic-fact labels, the gap reproduces: self-report <strong>0.541</strong>, classifier <strong>0.802</strong>, paired delta <strong>+0.262 [0.219, 0.302]</strong>.
               </p>
               <p>
                 The narrow claim: hidden activations carry recoverable claim-level correctness signal that the model's verbal confidence does not surface. The effect size matches across two settings with different label sources, generation sources, and content domains. FELM points the same way but remains statistically inconclusive; its matched-generation repair shows reference-bounded labels collapsing into evidence-coverage measurements once generated claims exceed the reference scope.
@@ -658,9 +473,9 @@
 
             <figure class="chart">
               <svg viewBox="0 0 960 460" role="img" aria-label="Self-report versus residual probe AUROC across MAUD, FActScore, and FELM">
-                <rect x="0" y="0" width="960" height="460" fill="#F9F9F6" />
+                <rect x="0" y="0" width="960" height="460" fill="#ffffff" />
                 <text x="480" y="30" text-anchor="middle" fill="#3B3B39"
-                      font-family="Libre Baskerville, Georgia, serif" font-size="18" font-weight="400">
+                      font-family="Inter, sans-serif" font-size="18" font-weight="400">
                   Claim-level AUROC: self-report vs residual probe
                 </text>
                 <text x="480" y="54" text-anchor="middle" fill="#969592"
@@ -799,9 +614,9 @@
 
             <figure class="chart">
               <svg viewBox="0 0 960 460" role="img" aria-label="MAUD method AUROC under GPT-5.4 vs Kimi K2.6 judges">
-                <rect x="0" y="0" width="960" height="460" fill="#F9F9F6" />
+                <rect x="0" y="0" width="960" height="460" fill="#ffffff" />
                 <text x="480" y="30" text-anchor="middle" fill="#3B3B39"
-                      font-family="Libre Baskerville, Georgia, serif" font-size="18" font-weight="400">
+                      font-family="Inter, sans-serif" font-size="18" font-weight="400">
                   MAUD judge sensitivity by method
                 </text>
                 <text x="480" y="54" text-anchor="middle" fill="#969592"
@@ -988,9 +803,9 @@
 
             <figure class="chart">
               <svg viewBox="0 0 960 420" role="img" aria-label="FActScore residual probe AUROC across train, validation, and test splits">
-                <rect x="0" y="0" width="960" height="420" fill="#F9F9F6" />
+                <rect x="0" y="0" width="960" height="420" fill="#ffffff" />
                 <text x="480" y="30" text-anchor="middle" fill="#3B3B39"
-                      font-family="Libre Baskerville, Georgia, serif" font-size="18" font-weight="400">
+                      font-family="Inter, sans-serif" font-size="18" font-weight="400">
                   FActScore residual probe by split
                 </text>
                 <text x="480" y="54" text-anchor="middle" fill="#969592"
@@ -1151,11 +966,6 @@
               The remaining questions sit on label provenance and matched-generation transfer, not on probe architecture. Downstream tools building on this should expose claim construction and label-provenance assumptions to users rather than hiding them behind opaque confidence scores. The probe is only as honest as the labels it was trained on.
             </p>
 
-          </div>
-        </div>
-      </article>
-    </main>
-
-  </div>
+            </article>
 </body>
 </html>

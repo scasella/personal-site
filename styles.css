@@ -231,9 +231,13 @@ a {
   transition: color 160ms ease, background 160ms ease;
 }
 
-.research-link + .research-link {
+.research-link:nth-child(2n) {
   border-left: 1px solid var(--line);
   padding-left: 18px;
+}
+
+.research-link:nth-child(n+3) {
+  border-top: 1px solid var(--line);
 }
 
 .research-link:hover {
@@ -1290,6 +1294,11 @@ button:focus-visible {
   .research-link + .research-link {
     border-left: 0;
     border-top: 1px solid var(--line);
+    padding-left: 0;
+  }
+
+  .research-link:nth-child(2n) {
+    border-left: 0;
     padding-left: 0;
   }
 

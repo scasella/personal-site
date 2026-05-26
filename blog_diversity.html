@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The diversity that post-training removes is recoverable at near-zero cost</title>
+  <meta name="description" content="A targeted reinforcement-learning pass on Qwen3-30B-A3B-Instruct restored output diversity across ten distinct tasks while leaving knowledge and reasoning benchmarks intact." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #fafaf8;
+      --paper: #ffffff;
+      --fg: #222;
+      --fg-mute: #555;
+      --fg-faint: #8a8a85;
+      --rule: #e2e2dd;
+      --hi: #f3f2ec;
+      --link: #1a5fb4;
+      --link-visited: #5a3aa3;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-sans);
+      font-size: 16.5px;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+    .site-header {
+      max-width: 720px; margin: 0 auto; padding: 28px 24px 0;
+      display: flex; justify-content: space-between; align-items: baseline;
+      font-size: 13px; color: var(--fg-mute);
+    }
+    .site-header a { color: var(--fg-mute); text-decoration: none; border-bottom: 1px dotted var(--fg-faint); }
+    article {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 24px 24px 64px;
+    }
+    .meta {
+      color: var(--fg-faint); font-size: 13px;
+      margin-bottom: 8px;
+    }
+    .meta .tag { color: var(--fg-mute); margin-left: 12px; }
+    h1 {
+      font-size: 32px;
+      line-height: 1.22;
+      font-weight: 600;
+      margin: 0 0 10px;
+      letter-spacing: -0.01em;
+      color: #111;
+    }
+    .subtitle {
+      color: var(--fg-mute);
+      font-size: 17px;
+      font-weight: 400;
+      line-height: 1.5;
+      margin: 0 0 24px;
+    }
+    h2 {
+      font-size: 22px;
+      font-weight: 600;
+      margin: 1.9em 0 0.5em;
+      line-height: 1.3;
+      letter-spacing: -0.005em;
+      color: #111;
+    }
+    h3 { font-size: 17px; font-weight: 600; margin: 1.5em 0 0.35em; }
+    p { margin: 0 0 0.9em; }
+    ul, ol { margin: 0 0 1em; padding-left: 1.4em; }
+    li { margin-bottom: 0.35em; }
+    a { color: var(--link); text-decoration: underline; text-decoration-color: rgba(26,95,180,0.4); }
+    a:visited { color: var(--link-visited); }
+    code { font-family: var(--font-mono); font-size: 0.85em; background: var(--hi); padding: 1px 5px; border-radius: 3px; }
+    strong { font-weight: 600; }
+    em { font-style: italic; }
+
+    blockquote {
+      margin: 1em 0;
+      padding: 6px 0 6px 18px;
+      border-left: 3px solid var(--rule);
+      color: var(--fg-mute);
+      font-style: normal;
+    }
+    blockquote p { font-size: 15.5px; margin: 0; }
+
+    .tldr {
+      margin: 1.2em 0 1.6em;
+      padding: 14px 18px;
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      font-size: 15.5px;
+    }
+    .tldr .label {
+      font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--fg-faint); margin-bottom: 8px;
+    }
+    .tldr p:last-child { margin: 0; }
+
+    figure, figure.chart { margin: 1.6em 0; }
+    figure svg, figure.chart svg { display: block; width: 100%; height: auto; background: var(--paper); border: 1px solid var(--rule); border-radius: 4px; }
+    figcaption { font-size: 13px; color: var(--fg-mute); margin-top: 10px; line-height: 1.5; }
+    @media (min-width: 960px) {
+      article > figure.chart {
+        width: min(1100px, calc(100vw - 3rem));
+        max-width: none;
+        margin-left: 50%;
+        transform: translateX(-50%);
+      }
+    }
+
+    details.glossary { margin: 1.4em 0; border: 1px solid var(--rule); border-radius: 4px; background: var(--paper); }
+    details.glossary > summary { cursor: pointer; padding: 10px 14px; font-size: 13px; font-weight: 600; color: var(--fg-mute); letter-spacing: 0.02em; list-style: none; }
+    details.glossary > summary::-webkit-details-marker { display: none; }
+    details.glossary > summary::before { content: "▸"; display: inline-block; width: 14px; font-size: 11px; color: var(--fg-faint); }
+    details.glossary[open] > summary::before { content: "▾"; }
+    details.glossary[open] > summary { border-bottom: 1px solid var(--rule); }
+    details.glossary ul { margin: 0; padding: 12px 18px 14px 36px; font-size: 14px; }
+    details.glossary li + li { margin-top: 6px; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 1em 0 1.5em; }
+    th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--rule); }
+    th { font-weight: 600; color: var(--fg-mute); font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid var(--fg-mute); }
+    tr.hl td { background: var(--hi); }
+    td.num { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+
+    hr { border: 0; border-top: 1px solid var(--rule); margin: 1.8em 0; }
+    .footer { font-size: 12.5px; color: var(--fg-faint); }
+
+    @media (max-width: 480px) {
+      .site-header { padding: 22px 20px 0; }
+      article { padding: 16px 20px 56px; }
+      h1 { font-size: 26px; line-height: 1.25; }
+      .subtitle { font-size: 16px; }
+      h2 { font-size: 20px; }
+      table { font-size: 13px; }
+      th, td { padding: 6px 8px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a href="index.html">casella.dev</a>
+    <a href="blog_interp.html">~/next</a>
+  </header>
+  <article>
+    <p class="meta">May 2026</p>
+    <h1>The diversity that post-training removes is recoverable at near-zero cost</h1>
+    <p class="subtitle">A targeted reinforcement-learning pass on Qwen3-30B-A3B-Instruct restored output diversity across ten distinct tasks while leaving knowledge and reasoning benchmarks intact.</p>
+
+    <div class="tldr">
+      <div class="label">TL;DR</div>
+      <p>Take an open-weight instruction-tuned model (Qwen3-30B-A3B-Instruct). Train it for <strong>50 reinforcement-learning steps</strong> on one task: "pick a random integer between 1 and 100." Output diversity improves on that task and on <strong>nine other tasks the model was never trained for</strong>: random color, fruit, animal, first name, word, emoji, card suit, integer 1&ndash;10, integer 1&ndash;1000.</p>
+      <p>MMLU stays flat. GSM8K stays flat. Compute cost: about <strong>$25</strong>.</p>
+    </div>
+
+    <h2>Where output diversity quietly disappears</h2>
+    <p>Brainstorming assistants. Creative-generation pipelines. Randomized exploration in agentic systems. Varied sampling in eval harnesses. Each one depends on the model producing different answers when you ask the same question twice. Each one loses that property after the standard "make this model helpful" training pass.</p>
+    <blockquote><p>When the Qwen3-30B-A3B instruct model I tested is asked to pick a random integer between 1 and 100, it puts more than 95% of its probability on just three numbers: 4, 42, and 47. The matched base model spreads its mass across the full range.</p></blockquote>
+    <p>I tested whether the loss is structural or recoverable. The loss is recoverable. The training pass that recovers it cost me about $25.</p>
+
+    <details class="glossary">
+      <summary>Terms used below</summary>
+      <ul>
+        <li><strong>Base model.</strong> Trained only on next-token prediction. Does not follow instructions.</li>
+        <li><strong>Instruct model.</strong> Base model further trained to follow user instructions (RLHF or DPO).</li>
+        <li><strong>Post-training.</strong> The pipeline that turns a base model into an instruct model.</li>
+        <li><strong>Output diversity.</strong> How spread the model's probability mass is across valid answers. 0 = flat, 1 = one answer every time. Total variation distance to uniform; lower is more diverse.</li>
+        <li><strong>Transfer.</strong> Improvement on a task the model was never trained for.</li>
+        <li><strong>MoE / A3B.</strong> Mixture-of-experts; <code>A3B</code> = 3 billion active parameters per token (out of 30 billion total in Qwen3-30B-A3B).</li>
+        <li><strong>GRPO.</strong> Group Relative Policy Optimization. The algorithm I used to train. For each prompt, the model generates a small group of responses; each response is scored; the model is nudged toward responses that scored higher than the others in the same group. In this experiment the score rewarded outputs that looked more spread out across the answer space.</li>
+      </ul>
+    </details>
+
+    <h2>What this enables</h2>
+    <p>The same training pass applies anywhere your product depends on the model producing different answers from the same prompt.</p>
+    <ol>
+      <li><strong>Brainstorming and creative-generation pipelines.</strong> When five "creative variations" come back looking the same, you are looking at post-training narrowing.</li>
+      <li><strong>Diverse sampling in agentic systems.</strong> Tool-use loops and planning agents suffer when the model defaults to one attempt on every prompt.</li>
+      <li><strong>Randomization in evaluation harnesses.</strong> If your eval shuffles answer options and the model converges on the same letter regardless, your scores are measuring post-training narrowing as much as the underlying capability.</li>
+      <li><strong>Synthetic data generation for distillation.</strong> You cannot distill diverse behavior out of a generator that does not have it.</li>
+    </ol>
+
+    <h2>The result, in one chart</h2>
+    <figure class="chart">
+      <svg viewBox="0 0 720 460" role="img" aria-label="Output concentration before and after training, ten tasks">
+        <text x="14" y="22" fill="#222" font-family="Inter, sans-serif" font-size="13" font-weight="600">Output concentration: before vs after 50 training steps</text>
+        <text x="14" y="40" fill="#8a8a85" font-family="Inter, sans-serif" font-size="11">Lower is more diverse. Trained on integer 1&ndash;100 only; nine other tasks improved unprompted.</text>
+
+        <!-- Axis frame -->
+        <line x1="160" y1="380" x2="680" y2="380" stroke="#bbb" stroke-width="1" />
+        <line x1="160" y1="78"  x2="160" y2="380" stroke="#e2e2dd" stroke-width="1" />
+        <line x1="290" y1="78"  x2="290" y2="380" stroke="#e2e2dd" stroke-width="1" stroke-dasharray="2 3" />
+        <line x1="420" y1="78"  x2="420" y2="380" stroke="#e2e2dd" stroke-width="1" stroke-dasharray="2 3" />
+        <line x1="550" y1="78"  x2="550" y2="380" stroke="#e2e2dd" stroke-width="1" stroke-dasharray="2 3" />
+        <line x1="680" y1="78"  x2="680" y2="380" stroke="#e2e2dd" stroke-width="1" />
+
+        <text x="160" y="396" text-anchor="middle" fill="#8a8a85" font-family="Inter, sans-serif" font-size="10">0.00</text>
+        <text x="290" y="396" text-anchor="middle" fill="#8a8a85" font-family="Inter, sans-serif" font-size="10">0.25</text>
+        <text x="420" y="396" text-anchor="middle" fill="#8a8a85" font-family="Inter, sans-serif" font-size="10">0.50</text>
+        <text x="550" y="396" text-anchor="middle" fill="#8a8a85" font-family="Inter, sans-serif" font-size="10">0.75</text>
+        <text x="680" y="396" text-anchor="middle" fill="#8a8a85" font-family="Inter, sans-serif" font-size="10">1.00</text>
+        <text x="160" y="412" text-anchor="middle" fill="#555" font-family="Inter, sans-serif" font-size="10">diverse</text>
+        <text x="680" y="412" text-anchor="middle" fill="#555" font-family="Inter, sans-serif" font-size="10">concentrated</text>
+
+        <!-- Legend (top) -->
+        <circle cx="186" cy="62" r="6" fill="#ffffff" stroke="#8a8a85" stroke-width="1.5" />
+        <text x="200" y="66" fill="#555" font-family="Inter, sans-serif" font-size="11">before training</text>
+        <circle cx="330" cy="62" r="6" fill="#222" />
+        <text x="344" y="66" fill="#555" font-family="Inter, sans-serif" font-size="11">after 50 steps</text>
+        <circle cx="490" cy="62" r="6" fill="#1a5fb4" />
+        <text x="504" y="66" fill="#555" font-family="Inter, sans-serif" font-size="11">trained task</text>
+
+        <!-- Row 1: integer 1-10  before=0.890 → x=623, after=0.115 → x=220 -->
+        <text x="150" y="104" text-anchor="end" fill="#222" font-family="Inter, sans-serif" font-size="12">integer 1&ndash;10</text>
+        <line x1="220" y1="100" x2="623" y2="100" stroke="#bbb" stroke-width="1.5" />
+        <circle cx="623" cy="100" r="6" fill="#ffffff" stroke="#8a8a85" stroke-width="1.5" />
+        <circle cx="220" cy="100" r="6" fill="#222" />
+
+        <!-- Row 2: fruit  0.461 → 400, 0.194 → 261 -->
+        <text x="150" y="134" text-anchor="end" fill="#222" font-family="Inter, sans-serif" font-size="12">fruit</text>
+        <line x1="261" y1="130" x2="400" y2="130" stroke="#bbb" stroke-width="1.5" />
+        <circle cx="400" cy="130" r="6" fill="#ffffff" stroke="#8a8a85" stroke-width="1.5" />
+        <circle cx="261" cy="130" r="6" fill="#222" />
+
+        <!-- Row 3: first name  0.607 → 476, 0.300 → 316 -->
+        <text x="150" y="164" text-anchor="end" fill="#222" font-family="Inter, sans-serif" font-size="12">first name</text>
+        <line x1="316" y1="160" x2="476" y2="160" stroke="#bbb" stroke-width="1.5" />
+        <circle cx="476" cy="160" r="6" fill="#ffffff" stroke="#8a8a85" stroke-width="1.5" />
+        <circle cx="316" cy="160" r="6" fill="#222" />
+
+        <!-- Row 4: color  0.889 → 622, 0.311 → 322 -->
+        <text x="150" y="194" text-anchor="end" fill="#222" font-family="Inter, sans-serif" font-size="12">color</text>
+        <line x1="322" y1="190" x2="622" y2="190" stroke="#bbb" stroke-width="1.5" />
+        <circle cx="622" cy="190" r="6" fill="#ffffff" stroke="#8a8a85" stroke-width="1.5" />
+        <circle cx="322" cy="190" r="6" fill="#222" />
+
+        <!-- Row 5: card suit  0.712 → 530, 0.370 → 352 -->
+        <text x="150" y="224" text-anchor="end" fill="#222" font-family="Inter, sans-serif" font-size="12">card suit</text>
+        <line x1="352" y1="220" x2="530" y2="220" stroke="#bbb" stroke-width="1.5" />
+        <circle cx="530" cy="220" r="6" fill="#ffffff" stroke="#8a8a85" stroke-width="1.5" />
+        <circle cx="352" cy="220" r="6" fill="#222" />
+
+        <!-- Row 6: integer 1-100 TRAINED  0.953 → 656, 0.413 → 375 -->
+        <text x="150" y="254" text-anchor="end" fill="#222" font-family="Inter, sans-serif" font-size="12" font-weight="600">integer 1&ndash;100</text>
+        <line x1="375" y1="250" x2="656" y2="250" stroke="#bbb" stroke-width="1.5" />
+        <circle cx="656" cy="250" r="6" fill="#ffffff" stroke="#8a8a85" stroke-width="1.5" />
+        <circle cx="375" cy="250" r="6" fill="#1a5fb4" />
+
+        <!-- Row 7: emoji  0.771 → 561, 0.420 → 378 -->
+        <text x="150" y="284" text-anchor="end" fill="#222" font-family="Inter, sans-serif" font-size="12">emoji</text>
+        <line x1="378" y1="280" x2="561" y2="280" stroke="#bbb" stroke-width="1.5" />
+        <circle cx="561" cy="280" r="6" fill="#ffffff" stroke="#8a8a85" stroke-width="1.5" />
+        <circle cx="378" cy="280" r="6" fill="#222" />
+
+        <!-- Row 8: animal  0.620 → 482, 0.522 → 431 -->
+        <text x="150" y="314" text-anchor="end" fill="#222" font-family="Inter, sans-serif" font-size="12">animal</text>
+        <line x1="431" y1="310" x2="482" y2="310" stroke="#bbb" stroke-width="1.5" />
+        <circle cx="482" cy="310" r="6" fill="#ffffff" stroke="#8a8a85" stroke-width="1.5" />
+        <circle cx="431" cy="310" r="6" fill="#222" />
+
+        <!-- Row 9: integer 1-1000  0.942 → 650, 0.571 → 457 -->
+        <text x="150" y="344" text-anchor="end" fill="#222" font-family="Inter, sans-serif" font-size="12">integer 1&ndash;1000</text>
+        <line x1="457" y1="340" x2="650" y2="340" stroke="#bbb" stroke-width="1.5" />
+        <circle cx="650" cy="340" r="6" fill="#ffffff" stroke="#8a8a85" stroke-width="1.5" />
+        <circle cx="457" cy="340" r="6" fill="#222" />
+
+        <!-- Row 10: word  0.770 → 560, 0.581 → 462 -->
+        <text x="150" y="374" text-anchor="end" fill="#222" font-family="Inter, sans-serif" font-size="12">word</text>
+        <line x1="462" y1="370" x2="560" y2="370" stroke="#bbb" stroke-width="1.5" />
+        <circle cx="560" cy="370" r="6" fill="#ffffff" stroke="#8a8a85" stroke-width="1.5" />
+        <circle cx="462" cy="370" r="6" fill="#222" />
+
+        <text x="14" y="446" fill="#8a8a85" font-family="Inter, sans-serif" font-size="11" font-style="italic">Sorted by post-training value. Every dot moved left; five of the nine untrained tasks landed at a lower value than the trained task.</text>
+      </svg>
+      <figcaption>One row per task. Hollow dot is the model before training; filled dot is the same model after 50 RL steps. The training task is highlighted in blue. Every line points the same direction.</figcaption>
+    </figure>
+
+    <h2>Why this is not just per-task fine-tuning</h2>
+    <p>You can fine-tune a model for each task you care about. I did not. I trained on one task and nine others improved. A per-task fine-tune would mean nine more training runs.</p>
+    <p>The cheapest task-specific fix needs no training at all: post-hoc <em>logit correction</em>. Subtract a per-choice bias from the model's output scores so the resulting distribution lands flat on whichever task you fit it to. I ran that as a baseline. On any single task it sets diversity to zero. But the bias vector for "pick an integer 1&ndash;100" has no defined meaning on "pick a color." Logit correction cannot transfer across tasks. The only way to get the result I measured is a parameter update that touches something the model represents <em>across</em> these tasks.</p>
+    <p>One training pass adjusted something the model uses for all ten of these tasks, not only the trained one. I don't know exactly what. The likely-but-unproven story: post-training nudges some shared internal setting toward narrower outputs across the board, and a short RL pass with a "reward more spread" signal nudges it back. The evidence is consistent with that. I have not isolated which weights changed.</p>
+
+    <h2>Per-task numbers</h2>
+    <table>
+      <thead><tr><th>Task</th><th class="num">Before</th><th class="num">After</th></tr></thead>
+      <tbody>
+        <tr><td>integer 1&ndash;10</td><td class="num">0.890</td><td class="num">0.115</td></tr>
+        <tr><td>fruit</td><td class="num">0.461</td><td class="num">0.194</td></tr>
+        <tr><td>first name</td><td class="num">0.607</td><td class="num">0.300</td></tr>
+        <tr><td>color</td><td class="num">0.889</td><td class="num">0.311</td></tr>
+        <tr><td>card suit</td><td class="num">0.712</td><td class="num">0.370</td></tr>
+        <tr class="hl"><td>integer 1&ndash;100 (trained)</td><td class="num">0.953</td><td class="num">0.413</td></tr>
+        <tr><td>emoji</td><td class="num">0.771</td><td class="num">0.420</td></tr>
+        <tr><td>animal</td><td class="num">0.620</td><td class="num">0.522</td></tr>
+        <tr><td>integer 1&ndash;1000</td><td class="num">0.942</td><td class="num">0.571</td></tr>
+        <tr><td>word</td><td class="num">0.770</td><td class="num">0.581</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Bounds</h2>
+    <p>This is one intervention on one model. I tested one open-weight family (Qwen3) at one size (30B total parameters, 3B active per token), trained on one task from a ten-task panel, and evaluated against a subset of standard capability benchmarks. Replicate with the model you ship before betting product strategy on the finding.</p>
+    <p>Three things I stand behind: the direction of the effect, the cross-task transfer, and the fact that knowledge and reasoning held steady across the benchmarks I ran.</p>
+
+    <h2>Close</h2>
+    <p>The conventional story about RLHF: it makes models better behaved at the cost of creativity, and the trade-off is fundamental. The trade-off is local. Fifty training steps on one task recover the diversity. Knowledge and reasoning hold.</p>
+    <p>If your product depends on the model emitting different answers from the same prompt, you have a knob you did not know existed. The instruct model you ship today does not have to stay narrow.</p>
+  </article>
+</body>
+</html>
