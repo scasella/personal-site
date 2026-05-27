@@ -90,6 +90,19 @@
     }
     blockquote p { font-size: 15.5px; margin: 0; }
 
+    .paper-links {
+      display: flex; align-items: center; gap: 0.75rem;
+      margin: 18px 0 8px; flex-wrap: wrap;
+    }
+    .paper-links .btn-pill {
+      font-size: 13px; line-height: 1; color: var(--fg);
+      text-decoration: none; background: var(--paper);
+      border: 1px solid var(--rule); border-radius: 999px;
+      padding: 0.55rem 0.95rem 0.65rem;
+      transition: background 200ms ease;
+    }
+    .paper-links .btn-pill:hover { background: var(--hi); }
+
     .tldr {
       margin: 1.2em 0 1.6em;
       padding: 14px 18px;
@@ -162,6 +175,10 @@
     <p class="meta">May 2026</p>
     <h1>A tiny RL pass recovers cross-task answer diversity in an instruction-tuned model</h1>
     <p class="subtitle">A targeted reinforcement-learning pass on Qwen3-30B-A3B-Instruct restored output diversity across ten distinct tasks while leaving knowledge and reasoning benchmarks intact.</p>
+
+    <div class="paper-links">
+      <a href="https://github.com/scasella/research-uniform-random-from-llms" class="btn-pill">GitHub repo</a>
+    </div>
 
     <div class="tldr">
       <div class="label">TL;DR</div>
