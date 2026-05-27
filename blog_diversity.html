@@ -131,6 +131,14 @@
     tr.hl td { background: var(--hi); }
     td.num { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
 
+    .specimens { padding: 4px 0; font-size: 14.5px; }
+    .specimen { padding: 12px 14px; border-top: 1px solid var(--rule); }
+    .specimen:first-child { border-top: 0; }
+    .specimen.hl { background: var(--hi); }
+    .specimen-task { font-weight: 600; color: var(--fg); margin-bottom: 6px; }
+    .specimen-row { color: var(--fg-mute); margin-top: 3px; line-height: 1.5; }
+    .picks-label { color: var(--fg-faint); font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.06em; margin-right: 10px; }
+
     hr { border: 0; border-top: 1px solid var(--rule); margin: 1.8em 0; }
     .footer { font-size: 12.5px; color: var(--fg-faint); }
 
@@ -173,6 +181,7 @@
         <li><strong>Instruct model.</strong> Base model further trained to follow user instructions (RLHF or DPO).</li>
         <li><strong>Post-training.</strong> The pipeline that turns a base model into an instruct model.</li>
         <li><strong>Output diversity.</strong> How spread the model's probability mass is across valid answers. 0 = flat, 1 = one answer every time. Total variation distance to uniform; lower is more diverse.</li>
+        <li><strong>Temperature.</strong> A sampling parameter that softens the model's output distribution. T=1.0 samples from the raw probabilities. T&gt;1.0 flattens them, raising diversity at some cost to coherence. T&lt;1.0 sharpens them.</li>
         <li><strong>Transfer.</strong> Improvement on a task the model was never trained for.</li>
         <li><strong>MoE / A3B.</strong> Mixture-of-experts; <code>A3B</code> = 3 billion active parameters per token (out of 30 billion total in Qwen3-30B-A3B).</li>
         <li><strong>GRPO.</strong> Group Relative Policy Optimization. The algorithm I used to train. For each prompt, the model generates a small group of responses; each response is scored; the model is nudged toward responses that scored higher than the others in the same group. In this experiment the score rewarded outputs that looked more spread out across the answer space.</li>
@@ -180,7 +189,7 @@
     </details>
 
     <h2>What this enables</h2>
-    <p>The same training pass applies anywhere your product depends on the model producing different answers from the same prompt.</p>
+    <p>This kind of training pass applies where your product depends on the model producing different responses to the same prompt.</p>
     <ol>
       <li><strong>Brainstorming and creative-generation pipelines.</strong> When five "creative variations" come back looking the same, you are looking at post-training narrowing.</li>
       <li><strong>Diverse sampling in agentic systems.</strong> Tool-use loops and planning agents suffer when the model defaults to one attempt on every prompt.</li>
@@ -283,11 +292,34 @@
       <figcaption>One row per task. Hollow dot is the model before training; filled dot is the same model after 50 RL steps. The training task is highlighted in blue. Every line points the same direction.</figcaption>
     </figure>
 
-    <h2>Why this is not just per-task fine-tuning</h2>
+    <p>The chart shows aggregate uniformity. Here are the actual top picks behind those numbers.</p>
+    <figure class="chart">
+      <div class="specimens">
+        <div class="specimen hl">
+          <div class="specimen-task">integer 1&ndash;100 (trained)</div>
+          <div class="specimen-row"><span class="picks-label">vanilla</span>42 &middot; 47 &middot; 1 &middot; 2 &middot; 3</div>
+          <div class="specimen-row"><span class="picks-label">trained</span>15 &middot; 36 &middot; 68 &middot; 46 &middot; 63</div>
+        </div>
+        <div class="specimen">
+          <div class="specimen-task">color</div>
+          <div class="specimen-row"><span class="picks-label">vanilla</span>blue &middot; green &middot; red &middot; orange &middot; yellow</div>
+          <div class="specimen-row"><span class="picks-label">trained</span>blue &middot; gray &middot; cyan &middot; purple &middot; magenta</div>
+        </div>
+        <div class="specimen">
+          <div class="specimen-task">fruit</div>
+          <div class="specimen-row"><span class="picks-label">vanilla</span>banana &middot; mango &middot; apple &middot; watermelon &middot; peach</div>
+          <div class="specimen-row"><span class="picks-label">trained</span>melon &middot; grape &middot; mango &middot; kiwi &middot; apple</div>
+        </div>
+      </div>
+      <figcaption>Three tasks, top-5 most-frequent picks from 50 samples per condition at temperature 1.0. The vanilla model concentrates on the canonical "random" picks for each domain. The trained model spreads to less obvious values; the trained task is highlighted.</figcaption>
+    </figure>
+
+    <h2>Why this is not just per-task fine-tuning, or temperature scaling</h2>
     <p>You can fine-tune a model for each task you care about. I did not. I trained on one task and nine others improved. A per-task fine-tune would mean nine more training runs.</p>
-    <p>The cheapest task-specific fix needs no training at all: post-hoc <em>logit correction</em>. Subtract a per-choice bias from the model's output scores so the resulting distribution lands flat on whichever task you fit it to. I ran that as a baseline. On any single task it sets diversity to zero. But the bias vector for "pick an integer 1&ndash;100" has no defined meaning on "pick a color." Logit correction cannot transfer across tasks. The only way to get the result I measured is a parameter update that touches something the model represents <em>across</em> these tasks.</p>
+    <p>The cheapest task-specific fix needs no training at all: post-hoc <em>logit correction</em>. Subtract a per-choice bias from the model's output scores so the resulting distribution lands flat on whichever task you fit it to. I ran that as a baseline. On any single task it sets diversity to zero. But the bias vector for "pick an integer 1&ndash;100" has no defined meaning on "pick a color." Logit correction cannot transfer across tasks. To produce the result I measured, the mechanism has to act across task families. A parameter update is one such mechanism.</p>
+    <p>Or temperature scaling? Raising sampling temperature is the cheapest diversity knob available. It doesn't reach this. Sampling all ten tasks at vanilla T=1.5 narrows the gap to trained-at-T=1.0 but closes only about a quarter of it. Mean TV-to-uniform at vanilla T=1.5 hovers around 0.71; the trained model at T=1.0 sits near 0.43. At T=1.5, ordinary temperature scaling did not replicate what training does on these tasks.</p>
+    <p>Beyond temperature there are stronger inference-time methods: contrastive decoding, base-model-assisted decoding, rejection sampling. They can recover diversity without changing weights, but they pay at inference time: extra models in the serving path, extra passes, or filtering. This experiment tests a different trade-off: pay once with a small parameter update, then sample normally. I have not run a head-to-head against those methods.</p>
     <p>One training pass adjusted something the model uses for all ten of these tasks, not only the trained one. I don't know exactly what. The likely-but-unproven story: post-training nudges some shared internal setting toward narrower outputs across the board, and a short RL pass with a "reward more spread" signal nudges it back. The evidence is consistent with that. I have not isolated which weights changed.</p>
-    <p>Inference-time methods (contrastive decoding, base-model-assisted decoding) can also pull an instruct model's output distribution toward a more spread reference without retraining. They keep two models in the serving path and pay the cost at every sample. A weight-level adjustment is paid once. I have not run a head-to-head comparison; either approach may be the right tool for a given deployment.</p>
 
     <h2>Per-task numbers</h2>
     <table>
@@ -306,15 +338,31 @@
       </tbody>
     </table>
 
+    <h2>What happens on reasoning tasks</h2>
+    <p>The ten tasks above are all categorical: pick a fruit, pick a color, pick an integer. The diversity lives in the answer space itself. Other product tasks are not shaped like that. Math reasoning has a single correct answer; the diversity lives in the path to it.</p>
+    <p>I sampled both vanilla and trained on 25 GSM8K problems, k=10 chains of thought per problem, at two temperatures. Among the correct chains in each cell I counted how many distinct calculation paths appeared (different sequences of intermediate numbers):</p>
+    <table>
+      <thead><tr><th>Condition</th><th class="num">Distinct paths (of 10)</th><th class="num">Correct (of 10)</th></tr></thead>
+      <tbody>
+        <tr><td>vanilla, T=1.0</td><td class="num">7.4</td><td class="num">9.8</td></tr>
+        <tr><td>vanilla, T=1.5</td><td class="num">8.4</td><td class="num">9.7</td></tr>
+        <tr class="hl"><td>trained, T=1.0</td><td class="num">8.4</td><td class="num">9.8</td></tr>
+        <tr><td>trained, T=1.5</td><td class="num">8.7</td><td class="num">9.4</td></tr>
+      </tbody>
+    </table>
+    <p>The picture flips. Vanilla at T=1.5 reaches the same raw diversity training does. Both push toward a soft ceiling near 8.7 distinct paths in a 10-sample draw. Training and temperature partially substitute on this task; combining them barely composes.</p>
+    <p>Accuracy is where they diverge. Training buys diversity for free: same 9.8 of 10 correct as the baseline at the same temperature. Temperature buys it for a small accuracy tax. Stacking them taxes more.</p>
+    <p>The result splits by task family. Where the answer space itself is the diversity target, training does something raising temperature to 1.5 did not. Where the answer is fixed and diversity lives in the path, training and temperature trade off in raw diversity, and training is the better Pareto choice because it preserves accuracy.</p>
+
     <h2>Bounds</h2>
     <p>This is one intervention on one model. I tested one open-weight family (Qwen3) at one size (30B total parameters, 3B active per token), trained on one task from a ten-task panel, and evaluated against a subset of standard capability benchmarks. Replicate with the model you ship before betting product strategy on the finding.</p>
-    <p>What's measured is total variation distance from uniform: distribution flattening, not necessarily useful diversity. For finite dice-like prompts (integers, card suits) uniform over valid answers is the right target. For open semantic domains (fruit, animal, word) "uniform over every valid answer" is not obviously what a product wants. The result restores entropy across categorical prompts; whether the recovered diversity helps a downstream workload is a separate question this post does not answer.</p>
+    <p>What's measured on the categorical tasks is total variation distance from uniform: distribution flattening, not necessarily useful diversity. For finite dice-like prompts (integers, card suits) uniform over valid answers is the right target. For open semantic domains (fruit, animal, word) "uniform over every valid answer" is not obviously what a product wants. The GSM8K test above gives a partial answer for reasoning tasks; for open-ended generation (essays, brainstorming, product naming) I have not measured.</p>
     <p>Knowledge and reasoning held steady on MMLU (200 questions) and GSM8K (50 problems). Those are smoke tests, not a deployment screen. A diversity-restoration update could affect instruction-following, calibration, safety behavior, tool-use reliability, or JSON formatting without moving either benchmark. The training compute was about $25; the operational cost of shipping a forked model (regression testing, safety review, version management) is separate and not free.</p>
-    <p>Three things I stand behind: the direction of the effect, the cross-task transfer on these categorical prompts, and the fact that knowledge and reasoning held steady across the benchmarks I ran.</p>
+    <p>Four things I stand behind: the direction of the effect, the cross-task transfer on these categorical prompts, the fact that knowledge and reasoning held steady across the benchmarks I ran, and that the trained model produces more diverse GSM8K reasoning paths than vanilla at the same temperature without losing accuracy.</p>
 
     <h2>Close</h2>
-    <p>The conventional story about RLHF: it makes models better behaved at the cost of creativity, and the trade-off is fundamental. The trade-off is local. Fifty training steps on one task recover the diversity. Knowledge and reasoning hold.</p>
-    <p>If your product depends on the model emitting different answers from the same prompt, you have a knob you did not know existed. The instruct model you ship today does not have to stay narrow.</p>
+    <p>The conventional story about RLHF: it makes models better behaved at the cost of creativity, and the trade-off is fundamental. The trade-off is more local than that. Fifty training steps on one task substantially recover the diversity across nine others. Knowledge and reasoning hold.</p>
+    <p>If your product depends on the model emitting different responses to the same prompt, you have a knob you did not know existed. On tasks where the answer space is the diversity target, the knob does something the temperature knob cannot. On tasks where diversity lives in the reasoning path, it is the accuracy-preserving alternative to turning temperature up. The instruct model you ship today does not have to stay narrow.</p>
   </article>
 </body>
 </html>
