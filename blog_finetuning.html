@@ -3,7 +3,82 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Verifier-guided prompt mining turned a zero-success 1.5B model into a transferable bug fixer with ten LoRA examples</title>
+  <title>A Transferable 1.5B Bug Fixer from Ten LoRA Examples | Stephen Casella</title>
+  <meta name="description" content="An open-weight 1.5B model scored zero verified bug fixes in 384 tries. Verifier-guided prompt mining surfaced ten correct fixes; a LoRA on them generalized to unseen bugs." />
+  <meta name="author" content="Stephen Casella" />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#fafaf8" />
+  <link rel="canonical" href="https://casella.dev/blog_finetuning.html" />
+  <meta property="og:site_name" content="Stephen Casella" />
+  <meta property="og:title" content="From zero verified fixes to a transferable bug fixer" />
+  <meta property="og:description" content="Prompt optimization mined ten verified fixes from a 1.5B model; a LoRA on those ten generalized to bug categories it never trained on." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://casella.dev/blog_finetuning.html" />
+  <meta property="og:image" content="https://casella.dev/assets/og/blog_finetuning.png" />
+  <meta property="og:image:secure_url" content="https://casella.dev/assets/og/blog_finetuning.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Social card: ten LoRA examples turned a 1.5B model from zero verified fixes into a transferable bug fixer." />
+  <meta property="article:author" content="Stephen Casella" />
+  <meta property="article:published_time" content="2026-05-26" />
+  <meta property="article:modified_time" content="2026-05-31" />
+  <meta property="article:tag" content="LoRA fine-tuning" />
+  <meta property="article:tag" content="verifier-guided prompt optimization" />
+  <meta property="article:tag" content="Qwen2.5-1.5B" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="From zero verified fixes to a transferable bug fixer" />
+  <meta name="twitter:description" content="Prompt optimization mined ten verified fixes from a 1.5B model; a LoRA on those ten generalized to unseen bug categories." />
+  <meta name="twitter:image" content="https://casella.dev/assets/og/blog_finetuning.png" />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-2RSWDWW67D"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-2RSWDWW67D');
+  </script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Verifier-guided prompt mining turned a zero-success 1.5B model into a transferable bug fixer with ten LoRA examples",
+      "description": "An open-weight Qwen2.5-1.5B-Instruct model produced zero verified-correct fixes across 384 attempts. Verifier-guided prompt optimization mined ten correct fixes, and a LoRA trained on those ten generalized to unseen bug categories.",
+      "url": "https://casella.dev/blog_finetuning.html",
+      "mainEntityOfPage": "https://casella.dev/blog_finetuning.html",
+      "image": "https://casella.dev/assets/og/blog_finetuning.png",
+      "datePublished": "2026-05-26",
+      "dateModified": "2026-05-31",
+      "author": {
+        "@type": "Person",
+        "name": "Stephen Casella",
+        "url": "https://casella.dev/",
+        "sameAs": [
+          "https://github.com/scasella",
+          "https://www.linkedin.com/in/stevecasella/"
+        ]
+      },
+      "publisher": {
+        "@type": "Person",
+        "name": "Stephen Casella",
+        "url": "https://casella.dev/"
+      },
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "Stephen Casella",
+        "url": "https://casella.dev/"
+      },
+      "keywords": [
+        "LoRA fine-tuning",
+        "verifier-guided prompt optimization",
+        "prompt mining",
+        "Qwen2.5-1.5B-Instruct",
+        "automated program repair",
+        "reinforcement learning"
+      ]
+    }
+  </script>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />

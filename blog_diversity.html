@@ -3,8 +3,84 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>A tiny RL pass recovers cross-task answer diversity in an instruction-tuned model</title>
+  <title>Cross-Task Answer Diversity from a Tiny RL Pass | Stephen Casella</title>
   <meta name="description" content="A targeted reinforcement-learning pass on Qwen3-30B-A3B-Instruct restored output diversity across ten distinct tasks while leaving knowledge and reasoning benchmarks intact." />
+  <meta name="author" content="Stephen Casella" />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#fafaf8" />
+  <link rel="canonical" href="https://casella.dev/blog_diversity.html" />
+  <meta property="og:site_name" content="Stephen Casella" />
+  <meta property="og:title" content="A tiny RL pass recovers cross-task answer diversity" />
+  <meta property="og:description" content="Fifty RL steps restored output diversity across nine held-out tasks on Qwen3-30B-A3B — with no benchmark regression." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://casella.dev/blog_diversity.html" />
+  <meta property="og:image" content="https://casella.dev/assets/og/blog_diversity.png" />
+  <meta property="og:image:secure_url" content="https://casella.dev/assets/og/blog_diversity.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Social card: fifty RL steps recovered cross-task answer diversity in Qwen3-30B-A3B-Instruct." />
+  <meta property="article:author" content="Stephen Casella" />
+  <meta property="article:published_time" content="2026-05-26" />
+  <meta property="article:modified_time" content="2026-05-31" />
+  <meta property="article:tag" content="answer diversity" />
+  <meta property="article:tag" content="RLVR" />
+  <meta property="article:tag" content="Qwen3-30B-A3B" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="A tiny RL pass recovers cross-task answer diversity" />
+  <meta name="twitter:description" content="Fifty RL steps restored output diversity across nine held-out tasks — with no benchmark cost." />
+  <meta name="twitter:image" content="https://casella.dev/assets/og/blog_diversity.png" />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-2RSWDWW67D"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-2RSWDWW67D');
+  </script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "A tiny RL pass recovers cross-task answer diversity in an instruction-tuned model",
+      "description": "A targeted reinforcement-learning pass on Qwen3-30B-A3B-Instruct restored output diversity across ten distinct tasks while leaving knowledge and reasoning benchmarks intact.",
+      "url": "https://casella.dev/blog_diversity.html",
+      "mainEntityOfPage": "https://casella.dev/blog_diversity.html",
+      "image": "https://casella.dev/assets/og/blog_diversity.png",
+      "datePublished": "2026-05-26",
+      "dateModified": "2026-05-31",
+      "author": {
+        "@type": "Person",
+        "name": "Stephen Casella",
+        "url": "https://casella.dev/",
+        "sameAs": [
+          "https://github.com/scasella",
+          "https://www.linkedin.com/in/stevecasella/"
+        ]
+      },
+      "publisher": {
+        "@type": "Person",
+        "name": "Stephen Casella",
+        "url": "https://casella.dev/"
+      },
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "Stephen Casella",
+        "url": "https://casella.dev/"
+      },
+      "keywords": [
+        "answer diversity",
+        "reinforcement learning",
+        "RLVR",
+        "Qwen3-30B-A3B",
+        "instruction tuning",
+        "output diversity",
+        "LoRA"
+      ],
+      "codeRepository": "https://github.com/scasella/research-uniform-random-from-llms"
+    }
+  </script>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
